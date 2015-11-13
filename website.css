@@ -1,0 +1,106 @@
+    body {
+        background-color: #ffffff;
+        margin-bottom:50px;
+        /*padding:0 0 0 0%;*/
+        color: #00521B;
+        font-family: sans-serif;
+        }
+
+        div#contents {
+            margin-left:20%;
+            margin-right:20%;
+            margin-top:5%; 
+            margin-bottom:5%; 
+        }
+
+        header {
+
+            }
+
+        footer {
+        /*position: fixed;*/
+        float: center;
+        height:10px;
+        margin-left: 25pc;
+        }
+
+        footer a{margin-left: 50px}
+
+        a:link{color:#00521B;text-decoration:none;border-bottom-style:dotted; 
+            border-bottom-width: thin;border-bottom-color: grey;} 
+        a:visited{color:#00521B;text-decoration:none;border-bottom-style:dotted; 
+            border-bottom-width: thin;border-bottom-color: grey;}
+        a:hover{color:grey;text-decoration:none;}
+        a:active{color:blue;text-decoration:none;}
+
+        ul {
+            list-style-type:circle;
+            margin:2% 20%;
+            }
+
+        h1 {
+            font-size: 2em;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+
+        h1 a:link, h2 a:link {
+            color:#FFFFFF;
+            text-decoration:none;
+            }      /* unvisited link */
+        h1 a:visited, h2 a:visited {
+            color:#FFFFFF;
+            text-decoration:none;
+             }  /* visited link */
+        h1 a:hover, h2 a:hover {color:grey;}  /* mouse over link */
+        h1 a:active, h2 a:active {color:#0000FF;}  /* selected link */
+        
+        section#cover {
+            background-image:url('figures/title_photo.jpg');
+            background-repeat: no-repeat;
+            
+            max-width: 100%;
+        }
+
+        section#cover h1{
+            color: #00521B;
+            font-size: 2em;
+            font-family: Courier;
+            padding:500 5 5 5pc;
+            margin:0 0 0 0px;
+        }
+
+        section#cover h2{
+            font-size:1em;
+            font-family:sans-serif;
+            padding:1 5 250 5pc;
+            color: #e5ffe5;
+        }
+
+        section#cover {
+            background-color:#f2f2f2;
+        }
+        
+       
+        h3{
+            margin:0 0 0 0%;
+            }
+
+
+        h4 {font-size:1.1em;
+            font-weight: bold;
+            margin:0 0 0 0%;
+            
+        }
+
+        h5{
+            font-size:1em;
+            font-weight: bold;
+        }
+
+        article {
+        
+        }
+
+       /*test*/
