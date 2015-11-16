@@ -3,7 +3,6 @@
 
 <html lang="en">
 
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
@@ -25,40 +24,45 @@
 <body>
 
 <header>
-
 </header>
 
+<div id="main_menu"> 
+<nav> 
+    <ul>
+        <li><h4><a href="#blog">blog</a></h4> </li>
+        <li><h4><a href="#data">data</a></h4></li>
+        <li><a href="#employment">employment</a></li>
+        <li><a href="#housing">housing</a></li>
+        <li><a href="#debt">debt and finance</a>
+        <li><a href="#petroleum">oil and gas</a></li>
+        </li>
+    </ul>
+</nav>
+</div>
 
-
-<!-- <section id="cover"> -->
 <section id="cover">
-	<span id = "main"> <h1>omstilling </h1> </span>
+    <span id = "main"> <h1>omstilling </h1> </span>
     <span id = "sub"> <h2>data, analysis and speculation about norway and its economy</h2></span>
 </section>
-<!-- </section> -->
-  
+
+
+
+
 <div id = "contents">
 
-<section id="blog">
-<h1>omstilling blog</h1> 
+<section id ="what_is_omstilling?"> 
+<h1>What is omstilling?</h1>
+<p>Omstilling is a Norwegian word that roughly translates into "realignment". It has been bandied around in Norway quite a lot the last few years for a couple of related reasons. </p>
 
-<!-- <article id="article_id">
-<h3>December 27th, 2014</h3> 
-<h2>Title of Post</h2>
+<p> The most immediate has been the recent, dramatic drop in oil prices. </p>
 
+<p>A more longterm challenge is climate change. Norway is western Europe's largest petroleum producer. For a people who otherwise would like to think that they place a high value on the environment, Norway's economic reliance on oil and gas is an uncomfortable fact.</p>
 
-</article> -->
+<p>Norway, it is said, needs to change. It needs a more diverse economy - less reliant on oil and gas. A realignment.</p>
 
-<article id="article_id">
-<h2>What is omstilling?</h2>
-<h3>November 15th, 2015</h3>
-<p>Omstilling is a norwegian word that roughly translates into "realignment". It has been bandied around in Norway quite a lot the last few years for a couple of related reasons. The most immediate has been the recent, dramatic drop in oil prices. Oil and gas make up roughly 30% of the Norwegian economy, so this is bound to have an effect. </p>
+<p>This website is meant as as a source for data on this realignment in real time. </p>
 
-<p>A more longterm challenge is the climate change. Norway is western europe's largest petroleum producer. For a people who otherwise would like to think that they place a high value on the environment, Norway's reliance on oil and gas is an uncomfortable fact.</p>
-
-<p>Norway, it is said, needs to change. It needs a more diverse economy, less reliant on oil and gas. A realignment.</p>
-
-<p>This website is meant as as a source of up-to-date data on this realignment in real time. The <a href="#blog">blog</a> section gives an occasional update and analysis on the state of the economy and country. 
+<p> The <a href="#blog">blog</a> section gives an occasional update and analysis on the state of the economy and country. 
 </p>
 
 <p>But more important is the <a href="#data">data</a> section.  The goal is to keep an up-to-date, easy to access visual overview of economic and national trends. </p>
@@ -70,35 +74,85 @@ Suggestions and comments can be sent to my gmail address, jmaurit.
 
 
 </article>
+
+</section>
+
+<section id="blog">
+<h1>blog</h1> 
+
+<!-- <article id="article_id">
+<h3>December 27th, 2014</h3> 
+<h2>Title of Post</h2>
+
+
+</article> -->
+
+<article id="article_id">
+<h3>November 15th, 2015</h3>
+
    
 </section>
 
    
 <section id="data">
 <h1>data</h1>
+
+<div id = "employment"> 
+
 <h2>Employment Data</h2>
 
-<h4>Unemployment rate, %, by gender</h4>
-<img src="figures/unemployment.png">
 
-<h4>Employment, 1000s, by gender</h4>
+<h4>Unemployment*, 1000s, by gender</h4>
+<img src="figures/unemployment.png">
+<p>This measure does not include those that are not actively looking for work, including those on long term disability.</p>
+
+<h4>Employment, % of 25-74 year olds, by gender</h4>
 <img src="figures/employment.png">
 <p>What surprises me here is how little recovery there was in employment after the financial crisis. Norway never experienced a deep recession after 2008, but we never got back to the solid economic numbers we experienced prior to 2008 either. With starkly lower oil prices, employment is also starting to take</p>
+</div>
 
+<div id = "housing"> 
 <h2>Housing</h2>
 <h4>Home prices, index, 2005=100</h4>
 <img src="figures/city_housing_prices.png"> 
 
-<h2>Bankruptcies and Financial Indicators</h2>
+</div>
 
-<h4>Unemployment rate, %, by gender</h4>
+<div id = "debt">
+<h2>Debt, Bankruptcies and Financial Indicators</h2>
+
+<h4>Gross debt, by sector</h4>
+<img src="figures/debt_by_sector.png">
+
+<h4>Household debt, by source</h4>
+<img src="figures/household_debt_by_source.png">
+
+<h4>Non-financial firm debt, by source</h4>
+<img src="figures/firm_debt_by_source.png">
+
+<h4>Number of bankruptcies</h4>
 <img src="figures/bank_plot.png"> 
 
+</div>
+
+<div id = "petroleum">
+<h2>Oil and Gas</h2>
+<h4>Price of Brent Crude Oil</h4>
+<img src="figures/brent_prices.png">
+
+<h4>Oil and Gas production on the Norwegian Continental Shelf</h4>
+<img src="figures/oil_gas_production.png">
+
+</div>
 
 </section>
-<h1>about</h1>
-<section>
 
+<section id="about">
+<h1>about</h1>
+<p>Contact me at my gmail acount, jmaurit.</p> 
+<p>My personal website can be found <a href="http://jmaurit.github.io">here</a></p>
+<p>Data is primarily from the <a href="https://data.ssb.no/api/">API of Statistics Norway</a>.</p>
+<p>If you want to see how I made the charts using python and matplotlib, <a href="norwayeconomy.html">see the ipython notebook</a>.</p>
 </section>
 
 </div> <!-- end for contents -->

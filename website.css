@@ -1,16 +1,69 @@
     body {
-        background-color: #ffffff;
+        background-color: #f2f2f2;
         margin-bottom:50px;
         /*padding:0 0 0 0%;*/
         color: #00521B;
         font-family: sans-serif;
         }
+    body p{color:black;}
 
         div#contents {
             margin-left:20%;
             margin-right:20%;
             margin-top:5%; 
             margin-bottom:5%; 
+        }
+
+        div#main_menu {
+        position: fixed;
+        float: left;
+        } 
+        div#main_menu ul {
+        list-style-type:none;
+        padding: 0;
+        margin: 50px 0 0 10px;
+        }   
+
+        div#main_menu ul li {
+        
+ 
+        }
+
+        div#main_menu ul li a{
+            display:block;
+            width: 220px;
+            padding: 5px 5px;
+            color: #00521B;
+            border-bottom-style:none;
+
+        }
+
+        div#main_menu a:hover{color:#1f78b4;text-decoration:none;}
+
+                section#cover {
+            background-image:url('figures/title_photo.jpg');
+            background-repeat: no-repeat;
+            
+            max-width: 100%;
+        }
+
+        section#cover h1{
+            color: #00521B;
+            font-size: 2em;
+            font-family: Courier;
+            padding:500 5 5 10pc;
+            margin:0 0 0 0px;
+        }
+
+        section#cover h2{
+            font-size:1em;
+            font-family:sans-serif;
+            padding:1 5 200 10pc;
+            color: #e5ffe5;
+        }
+
+        section#cover {
+            background-color:#f2f2f2;
         }
 
         header {
@@ -56,41 +109,18 @@
         h1 a:hover, h2 a:hover {color:grey;}  /* mouse over link */
         h1 a:active, h2 a:active {color:#0000FF;}  /* selected link */
         
-        section#cover {
-            background-image:url('figures/title_photo.jpg');
-            background-repeat: no-repeat;
-            
-            max-width: 100%;
+        img{
+            margin-top:2em;
+            margin-bottom: 2em;
         }
-
-        section#cover h1{
-            color: #00521B;
-            font-size: 2em;
-            font-family: Courier;
-            padding:500 5 5 5pc;
-            margin:0 0 0 0px;
-        }
-
-        section#cover h2{
-            font-size:1em;
-            font-family:sans-serif;
-            padding:1 5 250 5pc;
-            color: #e5ffe5;
-        }
-
-        section#cover {
-            background-color:#f2f2f2;
-        }
-        
-       
+             
         h3{
-            margin:0 0 0 0%;
+            margin:0 0 0 0em;
             }
 
 
-        h4 {font-size:1.1em;
-            font-weight: bold;
-            margin:0 0 0 0%;
+        h4 {
+            margin:0 0 0 0em;
             
         }
 

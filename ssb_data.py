@@ -7,17 +7,59 @@ import statsmodels.formula.api as smf
 import statsmodels.api as sm
 import sys
 import pystan
-import scipy
 from ggplot import *
 import math
 import re
 import json
 from datetime import datetime
+from scipy import interpolate
 
 pd.options.display.max_rows = 2000
 pd.options.display.max_columns = 100
 
-from pandas.io.json import json_normalize
+#default plot functions:
+plt.rcParams['xtick.labelsize'] = 14
+plt.rcParams['ytick.labelsize'] = 14
+plt.rcParams["axes.labelsize"]= 20
+plt.rcParams["figure.facecolor"] = "#f2f2f2"
+#plt.rcParams['figure.savefig.dpi'] = 100
+plt.rcParams['savefig.edgecolor'] = "#f2f2f2"
+plt.rcParams['savefig.facecolor'] ="#f2f2f2"
+plt.rcParams["figure.figsize"] = [15,8]
+#functions:
+
+#show categories in a json file
+def show_categories(json_data):
+	dimensions = json_data["dataset"]["dimension"]
+	time = dimensions.pop("Tid", None)
+	return(dimensions)
+
+#convert to datetime
+def convert_datetime(date_series):
+	if "K" in date_series[0]:
+		time = date_series.apply(lambda x: x.replace("K",""))
+		month = [str(int(t[-1])*3) for t in time]
+		year = [str(int(t[:-1])) for t in time]
+		new_date_series = [x+y for x,y in zip(year, month)]
+		new_date_series = pd.to_datetime(new_date_series, format='%Y%m')
+	if "M" in date_series[0]:
+		time = date_series.apply(lambda x: x.replace("M",""))
+		new_date_series = pd.to_datetime(time, format='%Y%m')
+		return(new_date_series)
+
+def format_df(df):
+	"""
+	columns should be labeled with "time" for the date and 
+	"value" for the date. 
+	inserts na values and converts value to float type. 
+
+	"""
+	df["time"] = convert_datetime(df.time)
+	df["value"][df.value == ".."] =np.nan
+	df["value"] = df.value.astype(float)
+	return(df)
+
+
 
 employment_json = pd.read_json("https://data.ssb.no/api/v0/dataset/1054.json?lang=en")
 
@@ -112,15 +154,6 @@ bankruptcies = pd.read_csv("https://data.ssb.no/api/v0/dataset/95265.csv?lang=en
 enter_bank = bankruptcies[bankruptcies.contents == 'Bankruptcies related to enterprises (excl. sole propriertorships)']
 pers_bank = bankruptcies[bankruptcies.contents == 'Personal bankruptcies (incl. sole propriertorships)']
 
-def format_df(df):
-	df.columns = ["time", "contents", "value"]
-	df = df[["time", "value"]]
-	df["time"] = df.time.apply(lambda x:  x.replace("M", ""))
-	df["time"] = pd.to_datetime(df["time"], format="%Y%m")
-	df["value"][df.value == ".."] =np.nan
-	df["value"] = df.value.astype(float)
-	return(df)
-
 enter_bank = format_df(enter_bank)
 pers_bank = format_df(pers_bank)
 
@@ -202,7 +235,179 @@ fig.set_size_inches(11,7)
 fig.savefig("figures/city_housing_prices.png")
 plt.show()
 
+#credit
+debt_json = pd.read_json("https://data.ssb.no/api/v0/dataset/62264.json?lang=no")
+debt_cat = show_categories(debt_json)
+debt_cat
 
-#Police offences
-police_offences = pd.read_json("https://data.ssb.no/api/v0/dataset/81192.json?lang=en")
+debt = pd.read_csv("https://data.ssb.no/api/v0/dataset/62264.csv?lang=no", sep=";")
+debt.columns = ['currency', 'sector', 'credit_source', 'time', 'variable',
+       'value']
+
+debt["time"] = convert_datetime(debt.time)
+debt["value"][debt.value == ".."] = np.nan
+debt["value"] = debt.value.astype(float)
+debt["value"] = debt["value"]/1000
+
+by_source = debt.groupby("credit_source")
+for source in by_source:
+	print(source[0])
+
+by_sector = debt.groupby("sector")
+for sect in by_sector:
+	print(sect[0])
+
+total_sources = debt[debt.credit_source=="LTOT Kredittkilder i alt"]
+total_sources = total_sources[total_sources.currency=="00 I alt"]
+total_sources["value"] = total_sources.value.astype(float)
+
+fig, ax = plt.subplots()
+tot_by_sector = total_sources.groupby("sector")
+for sect in tot_by_sector:
+	ax.plot(sect[1].time, sect[1].value, label=sect[0])
+#ax.legend()
+ax.annotate("Total", xy=(yearmonth("200801"),3500), size=14)
+ax.annotate("Households", xy=(yearmonth("200801"), 2200), size=14)
+ax.annotate("Non-financial firms", xy=(yearmonth("200801"), 1300), size=14)
+ax.annotate("Municipalities", xy=(yearmonth("200801"), 500), size=14)
+ax.set_ylabel("Gross debt, billions NOK")
+fig.set_size_inches(15,8)
+#fig.savefig("figures/debt_by_sector.png")
+plt.show()
+
+
+#household sector and non-financial firms by source
+
+debt = debt[debt.value.notnull()]
+debt = debt[debt.value!=0]
+
+household = debt[debt.sector=="Kred04 Husholdninger mv."]
+household = household[household.currency =="00 I alt"]
+
+firms = debt[debt.sector=="Kred03 Ikke-finansielle foretak"]
+firms = firms[firms.currency =="00 I alt"]
+
+source_inc = ["L201 Statlige l�neinstitutter",
+"L202 Banker",
+"L203 Kredittforetak",
+"LTOT Kredittkilder i alt"]
+
+household = household[household.credit_source.isin(source_inc)]
+
+fig, ax = plt.subplots()
+household_by_source = household.groupby("credit_source")
+for source in household_by_source:
+	ax.plot(source[1].time, source[1].value, label=source[0])
+ax.legend()
+	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
+ax.set_ylabel("Household gross debt, billions NOK")
+fig.set_size_inches(15,8)
+plt.show()
+
+#household debt by currency
+household = debt[debt.sector=="Kred04 Husholdninger mv."]
+household = household[household.credit_source == "LTOT Kredittkilder i alt"]
+
+fig, ax = plt.subplots()
+household_by_currency = household.groupby("currency")
+for currency in household_by_currency:
+	ax.plot(currency[1].time, currency[1].value, label=currency[0])
+ax.legend()
+	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
+ax.set_ylabel("Household gross debt, billions NOK")
+fig.set_size_inches(15,8)
+plt.show()
+
+#non-financial debt by source:
+
+firms_inc = ["L201 Statlige l�neinstitutter",
+"L202 Banker",
+"L203 Kredittforetak",
+"L204 Finansieringsselskaper",
+"L206 Livsforsikringsselskaper",
+"L207 Skadeforsikringsselskaper",
+"L209 Pensjonskasser",
+"L210 Obligasjonsgjeld",
+"L211 Sertifikatgjeld",
+"L212 Andre kilder",
+"LTOT Kredittkilder i alt"]
+
+#firms = firms[firms.credit_source.isin(source_inc)]
+
+fig, ax = plt.subplots()
+firms_by_source = firms.groupby("credit_source")
+for source in firms_by_source:
+	print(source[0])
+	ax.plot(source[1].time, source[1].value, label=source[0])
+ax.legend()
+	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
+ax.set_ylabel("firms gross debt, billions NOK")
+fig.set_size_inches(15,8)
+plt.show()
+
+
+
+#oil and gas
+
+#prices from eia
+xls = pd.ExcelFile("http://www.eia.gov/dnav/pet/hist_xls/RBRTEm.xls")
+brent_prices = xls.parse('Data 1', header=2)
+
+brent_prices.columns = ["date", "brent_price"]
+brent_prices["date"] = pd.to_datetime(brent_prices.date, format="%Y-%m-%d")
+
+fig, ax = plt.subplots()
+ax.plot(brent_prices.date, brent_prices.brent_price, label="Brent Crude Price, $/Barrel")
+ax.legend()
+	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
+ax.set_ylabel("Brent oil price, USD / Barrel")
+plt.show()
+
+
+#prices from NPD
+tot_prod=pd.read_csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_production_totalt_NCS_month__DisplayAllRows&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.56&CultureCode=nb-no")
+tot_prod.columns = ['﻿prod_year', 'prod_month', 
+'oil_millm3', 'gas_billsm3',
+'ngl_millsm3', 'condensate_millsm3',
+'oe_millsm3', 'water_millsm3']
+
+tot_prod["date"] = pd.to_datetime(tot_prod.loc[:, '﻿prod_year'].astype(str) + tot_prod.loc[:,"prod_month"].astype(str),
+	format = "%Y%m")
+
+prod_include = ['date', 'oil_millm3', 'gas_billsm3','water_millsm3']
+tot_prod = tot_prod[prod_include]
+
+tot_prod_long = pd.melt(tot_prod, id_vars =["date"])
+tot_prod_long["value"] = tot_prod_long.value.astype(float)
+tot_prod_long = tot_prod_long[tot_prod_long.value!=0]
+
+def smooth_series(srs):
+	x_range = [i for i in range(len(srs))]
+	smoothed = sm.nonparametric.lowess(srs,x_range, frac=0.1)
+	return(pd.Series(smoothed[:,1]))
+
+smoothed = tot_prod_long.groupby("variable")["value"].transform(smooth_series)
+tot_prod_long["smoothed"] = smoothed
+
+fig, ax = plt.subplots()
+prod_by_liquid = tot_prod_long.groupby("variable")
+for liquid in prod_by_liquid:
+	ax.plot(liquid[1].date, liquid[1].value, label=liquid[0])
+plt.gca().set_color_cycle(None)
+for liquid in prod_by_liquid:
+	ax.plot(liquid[1].date, liquid[1].smoothed)
+ax.legend()
+#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
+ax.set_ylabel("Production")
+plt.show()
+
+#in MillSm3
+
+investments<-read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_investment_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en", stringsAsFactors=FALSE)
+reserves<-read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en", stringsAsFactors=FALSE)
+
+month.prod<-read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.56&CultureCode=nb-no", stringsAsFactors=FALSE)
+
+
+
 
