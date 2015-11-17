@@ -168,13 +168,10 @@
 	"buffers":
 	[
 		{
-			"contents": "import pandas as pd\nimport numpy as np\nimport matplotlib as mpt\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport statsmodels.formula.api as smf\nimport statsmodels.api as sm\nimport sys\nimport pystan\nfrom ggplot import *\nimport math\nimport re\nimport json\nfrom datetime import datetime\nfrom scipy import interpolate\n\npd.options.display.max_rows = 2000\npd.options.display.max_columns = 100\n\n#default plot functions:\nplt.rcParams['xtick.labelsize'] = 14\nplt.rcParams['ytick.labelsize'] = 14\nplt.rcParams[\"axes.labelsize\"]= 20\nplt.rcParams[\"figure.facecolor\"] = \"#f2f2f2\"\n#plt.rcParams['figure.savefig.dpi'] = 100\nplt.rcParams['savefig.edgecolor'] = \"#f2f2f2\"\nplt.rcParams['savefig.facecolor'] =\"#f2f2f2\"\nplt.rcParams[\"figure.figsize\"] = [15,8]\n#functions:\n\n#show categories in a json file\ndef show_categories(json_data):\n	dimensions = json_data[\"dataset\"][\"dimension\"]\n	time = dimensions.pop(\"Tid\", None)\n	return(dimensions)\n\n#convert to datetime\ndef convert_datetime(date_series):\n	if \"K\" in date_series[0]:\n		time = date_series.apply(lambda x: x.replace(\"K\",\"\"))\n		month = [str(int(t[-1])*3) for t in time]\n		year = [str(int(t[:-1])) for t in time]\n		new_date_series = [x+y for x,y in zip(year, month)]\n		new_date_series = pd.to_datetime(new_date_series, format='%Y%m')\n	if \"M\" in date_series[0]:\n		time = date_series.apply(lambda x: x.replace(\"M\",\"\"))\n		new_date_series = pd.to_datetime(time, format='%Y%m')\n		return(new_date_series)\n\ndef format_df(df):\n	\"\"\"\n	columns should be labeled with \"time\" for the date and \n	\"value\" for the date. \n	inserts na values and converts value to float type. \n\n	\"\"\"\n	df[\"time\"] = convert_datetime(df.time)\n	df[\"value\"][df.value == \"..\"] =np.nan\n	df[\"value\"] = df.value.astype(float)\n	return(df)\n\n\n\nemployment_json = pd.read_json(\"https://data.ssb.no/api/v0/dataset/1054.json?lang=en\")\n\nage_labels = employment_json[\"dataset\"][\"dimension\"][\"Alder\"]\nsex_labels = employment_json[\"dataset\"][\"dimension\"][\"Kjonn\"]\ncontent_labels = employment_json[\"dataset\"][\"dimension\"][\"ContentsCode\"]\n\nemployment = pd.read_csv(\"https://data.ssb.no/api/v0/dataset/1054.csv?lang=en\")\n\nemployment.columns = [\"sex\", \"age\", \"contents\", \"time\", \"value\"]\n\n# employment_all_25_74 = employment[employment.sex==\"0 Both sexes\"]\n# employment_all_25_74 =employment_all_25_74[employment_all_25_74.age==\"25-74 25-74 years\"]\n# employment_all_25_74 = employment_all_25_74[[\"contents\", \"time\", \"unemp\"]]\n# employment_all_25_74.pivot(index='time', columns='contents', values='value')\n\nunemp_1000 = employment[employment.contents == 'Unemployment (LFS) (1 000 persons), seasonally adjusted']\n#unemp_1000 = unemp_1000[unemp_1000.sex==\"0 Both sexes\"]\nunemp_1000 = unemp_1000[unemp_1000.age==\"25-74 25-74 years\"]\nunemp_1000 = unemp_1000[[\"time\", \"sex\", \"value\"]]\n\nunemp_1000[\"time\"] = unemp_1000.time.apply(lambda x:  x.replace(\"M\", \"\"))\nunemp_1000[\"time\"] = pd.to_datetime(unemp_1000[\"time\"], format=\"%Y%m\")\n\nunemp_1000[\"value\"][unemp_1000.value == \"..\"] = np.nan\nunemp_1000[\"value\"] = unemp_1000.value.astype(float)\n\nunemp_1000.columns =[\"date\", \"sex\", \"value\"]\nunemp_1000[\"sex\"] = unemp_1000.sex.apply(lambda x: x[2:])\n\n#unemp_1000.set_index(\"date\", inplace=True)\n#unemp_1000.reset_index(inplace=True)\n\n#start_date = datetime.strptime('01012006', '%d%m%Y')\n#end_date = datetime.strptime('01012016', '%d%m%Y')\n\nfig, ax = plt.subplots()\nstart = datetime.strptime('01012008', '%d%m%Y')\nunemp_by_sex = unemp_1000.groupby(\"sex\")\nfor unemp in unemp_by_sex:\n	ax.plot(unemp[1].date, unemp[1].value, label=unemp[0])\n	ax.annotate(unemp[0], xy=(start, np.array(unemp[1].value)[0]+1))\nax.legend()\nax.set_ylabel(\"Norwegian unemployment, 1000s\")\nfig.set_size_inches(10,7)\n#fig.savefig(\"figures/unemployment.png\")\nplt.show()\n\n#employed persons\nemp_perc_sa = employment[employment.contents == \"Employed persons in per cent of the population, seasonally adjusted\"]\n\nemp_perc_sa = emp_perc_sa[emp_perc_sa.age==\"25-74 25-74 years\"]\nemp_perc_sa = emp_perc_sa[[\"time\", \"sex\", \"value\"]]\n\nemp_perc_sa[\"time\"] = emp_perc_sa.time.apply(lambda x:  x.replace(\"M\", \"\"))\nemp_perc_sa[\"time\"] = pd.to_datetime(emp_perc_sa[\"time\"], format=\"%Y%m\")\n\nemp_perc_sa[\"value\"][emp_perc_sa.value == \"..\"] =np.nan\nemp_perc_sa[\"value\"] = emp_perc_sa.value.astype(float)\n\nemp_perc_sa.columns =[\"date\", \"sex\", \"value\"]\nemp_perc_sa[\"sex\"] = emp_perc_sa.sex.apply(lambda x: x[2:])\n\nemp_perc_sa.set_index(\"date\", inplace=True)\nemp_perc_sa.reset_index(inplace=True)\n\nstart = datetime.strptime('01012000', '%d%m%Y')\n\nfig, ax = plt.subplots()\nemp_by_sex = emp_perc_sa.groupby(\"sex\")\nfor emp in emp_by_sex:\n	ax.plot(emp[1].date, emp[1].value, label=emp[0])\n	ax.annotate(emp[0], xy=(start, np.array(emp[1].value[0])+5 ))\nax.set_ylabel(\"Norwegian Employment, %\")\nfig.set_size_inches(11,7)\nplt.show()\n\n\n\n#Bankruptcies***************************\n\ndef show_categories(json_data):\n	print(json_data[\"dataset\"][\"dimension\"][\"ContentsCode\"])\n\nshow_categories(bank_json)\n\nbank_json = pd.read_json(\"https://data.ssb.no/api/v0/dataset/95265.json?lang=en\")\nbank_json[\"dataset\"][\"dimension\"][\"ContentsCode\"]\n\nbankruptcies = pd.read_csv(\"https://data.ssb.no/api/v0/dataset/95265.csv?lang=en\")\n\nenter_bank = bankruptcies[bankruptcies.contents == 'Bankruptcies related to enterprises (excl. sole propriertorships)']\npers_bank = bankruptcies[bankruptcies.contents == 'Personal bankruptcies (incl. sole propriertorships)']\n\nenter_bank = format_df(enter_bank)\npers_bank = format_df(pers_bank)\n\nstart = datetime.strptime('01012000', '%d%m%Y')\n\nfrom scipy.interpolate import UnivariateSpline\n\nenter_bank = enter_bank[enter_bank.value.notnull()]\npers_bank = pers_bank[pers_bank.value.notnull()]\n\nt = len(enter_bank.time)\nT = [i for i in range(t)]\ns_enter = UnivariateSpline(T, enter_bank.value, k=3, s=400000)\nsmooth_enter = s_enter(T)\ns_pers = UnivariateSpline(T, pers_bank.value, k=3, s=200000)\nsmooth_person = s_pers(T)\n\n\nfig, ax = plt.subplots()\nax.plot(enter_bank.time, enter_bank.value, color=\"green\", alpha=.5)\nax.plot(enter_bank.time, smooth_enter, color=\"green\")\nax.plot(pers_bank.time, pers_bank.value, color=\"navy\", alpha=.5)\nax.plot(pers_bank.time, smooth_person, color=\"navy\")\nax.annotate('Personal Bankruptcies', xy=(start, 350), size=14)\nax.annotate('Enterprise Bankruptcies', xy=(start, 40), size=14)\nax.set_ylabel(\"Bankruptcies in Norway, per month\", size=14)\nfig.set_size_inches(10,8)\nfig.savefig(\"figures/bank_plot.png\")\nplt.show()\n\n\n#Boligpriser\n\nhouse_prices = pd.read_csv(\"https://data.ssb.no/api/v0/dataset/1060.csv?lang=no\", sep=\";\", header=0)\nhouse_prices.columns = ['region', 'type', 'time', 'variable','value']\ntime = house_prices.time.apply(lambda x: x.replace(\"K\",\"\"))\nmonth = [str(int(t[-1])*3) for t in time]\nyear = [str(int(t[:-1])) for t in time]\nhouse_prices[\"time\"] = [x+y for x,y in zip(year, month)]\nhouse_prices[\"time\"] = pd.to_datetime(house_prices.time, format='%Y%m')\nna_values = [\"..\", \".\"]\nhouse_prices = house_prices[~house_prices.value.isin(na_values)]\nhouse_prices[\"value\"] = house_prices.value.apply(lambda x: float(x.replace(\",\", \".\")))\n\nnames = []\nprices_by_region = house_prices.groupby(\"region\")\nfor region in prices_by_region:\n	names.append(region[0])\n\nnew_names = [\"Oslo with Baerum\", \"Stavanger\", \"Bergen\", \n\"Trondheim\", \"Akershus\", \"Southeast\", \"Hedmark and Oppland\",\n\"Agder and Rogaland\", \"Westcoast\", \"Troendelag\", \"Northern Norway\",\n\"Total\"]\n\nnames_dict = dict(zip(names,new_names))\n\nhouse_prices[\"region\"] = house_prices.region.apply(lambda x: names_dict[x])\n\ncities = new_names[0:4]\n\nhouse_prices_cities = house_prices[house_prices.region.isin(cities)]\ntotal_cities = house_prices_cities[house_prices_cities.type == \"00 Boliger i alt\"]\n\n#blah\n\nstart = datetime.strptime('01012005', '%d%m%Y')\nend = datetime.strptime('01012015', '%d%m%Y')\ntotal_cities = total_cities[total_cities.time>=start]\n\nfig, ax = plt.subplots()\nhouses_by_city= total_cities.groupby(\"region\")\nfor city in houses_by_city:\n	ax.plot(city[1].time, city[1].value, label=city[0])\n	ax.legend()\n	#n = len(region[1].value)\nax.annotate(\"Trondheim\", xy=(datetime.strptime('01012007', '%d%m%Y'),110)\nax.set_ylabel(\"Housing Prices, index, 2005 = 100\", size=14)\nfig.set_size_inches(11,7)\nfig.savefig(\"figures/city_housing_prices.png\")\nplt.show()\n\n#credit\ndebt_json = pd.read_json(\"https://data.ssb.no/api/v0/dataset/62264.json?lang=no\")\ndebt_cat = show_categories(debt_json)\ndebt_cat\n\ndebt = pd.read_csv(\"https://data.ssb.no/api/v0/dataset/62264.csv?lang=no\", sep=\";\")\ndebt.columns = ['currency', 'sector', 'credit_source', 'time', 'variable',\n       'value']\n\ndebt[\"time\"] = convert_datetime(debt.time)\ndebt[\"value\"][debt.value == \"..\"] = np.nan\ndebt[\"value\"] = debt.value.astype(float)\ndebt[\"value\"] = debt[\"value\"]/1000\n\nby_source = debt.groupby(\"credit_source\")\nfor source in by_source:\n	print(source[0])\n\nby_sector = debt.groupby(\"sector\")\nfor sect in by_sector:\n	print(sect[0])\n\ntotal_sources = debt[debt.credit_source==\"LTOT Kredittkilder i alt\"]\ntotal_sources = total_sources[total_sources.currency==\"00 I alt\"]\ntotal_sources[\"value\"] = total_sources.value.astype(float)\n\nfig, ax = plt.subplots()\ntot_by_sector = total_sources.groupby(\"sector\")\nfor sect in tot_by_sector:\n	ax.plot(sect[1].time, sect[1].value, label=sect[0])\n#ax.legend()\nax.annotate(\"Total\", xy=(yearmonth(\"200801\"),3500), size=14)\nax.annotate(\"Households\", xy=(yearmonth(\"200801\"), 2200), size=14)\nax.annotate(\"Non-financial firms\", xy=(yearmonth(\"200801\"), 1300), size=14)\nax.annotate(\"Municipalities\", xy=(yearmonth(\"200801\"), 500), size=14)\nax.set_ylabel(\"Gross debt, billions NOK\")\nfig.set_size_inches(15,8)\n#fig.savefig(\"figures/debt_by_sector.png\")\nplt.show()\n\n\n#household sector and non-financial firms by source\n\ndebt = debt[debt.value.notnull()]\ndebt = debt[debt.value!=0]\n\nhousehold = debt[debt.sector==\"Kred04 Husholdninger mv.\"]\nhousehold = household[household.currency ==\"00 I alt\"]\n\nfirms = debt[debt.sector==\"Kred03 Ikke-finansielle foretak\"]\nfirms = firms[firms.currency ==\"00 I alt\"]\n\nsource_inc = [\"L201 Statlige l�neinstitutter\",\n\"L202 Banker\",\n\"L203 Kredittforetak\",\n\"LTOT Kredittkilder i alt\"]\n\nhousehold = household[household.credit_source.isin(source_inc)]\n\nfig, ax = plt.subplots()\nhousehold_by_source = household.groupby(\"credit_source\")\nfor source in household_by_source:\n	ax.plot(source[1].time, source[1].value, label=source[0])\nax.legend()\n	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))\nax.set_ylabel(\"Household gross debt, billions NOK\")\nfig.set_size_inches(15,8)\nplt.show()\n\n#household debt by currency\nhousehold = debt[debt.sector==\"Kred04 Husholdninger mv.\"]\nhousehold = household[household.credit_source == \"LTOT Kredittkilder i alt\"]\n\nfig, ax = plt.subplots()\nhousehold_by_currency = household.groupby(\"currency\")\nfor currency in household_by_currency:\n	ax.plot(currency[1].time, currency[1].value, label=currency[0])\nax.legend()\n	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))\nax.set_ylabel(\"Household gross debt, billions NOK\")\nfig.set_size_inches(15,8)\nplt.show()\n\n#non-financial debt by source:\n\nfirms_inc = [\"L201 Statlige l�neinstitutter\",\n\"L202 Banker\",\n\"L203 Kredittforetak\",\n\"L204 Finansieringsselskaper\",\n\"L206 Livsforsikringsselskaper\",\n\"L207 Skadeforsikringsselskaper\",\n\"L209 Pensjonskasser\",\n\"L210 Obligasjonsgjeld\",\n\"L211 Sertifikatgjeld\",\n\"L212 Andre kilder\",\n\"LTOT Kredittkilder i alt\"]\n\n#firms = firms[firms.credit_source.isin(source_inc)]\n\nfig, ax = plt.subplots()\nfirms_by_source = firms.groupby(\"credit_source\")\nfor source in firms_by_source:\n	print(source[0])\n	ax.plot(source[1].time, source[1].value, label=source[0])\nax.legend()\n	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))\nax.set_ylabel(\"firms gross debt, billions NOK\")\nfig.set_size_inches(15,8)\nplt.show()\n\n\n\n#oil and gas\n\n#prices from eia\nxls = pd.ExcelFile(\"http://www.eia.gov/dnav/pet/hist_xls/RBRTEm.xls\")\nbrent_prices = xls.parse('Data 1', header=2)\n\nbrent_prices.columns = [\"date\", \"brent_price\"]\nbrent_prices[\"date\"] = pd.to_datetime(brent_prices.date, format=\"%Y-%m-%d\")\n\nfig, ax = plt.subplots()\nax.plot(brent_prices.date, brent_prices.brent_price, label=\"Brent Crude Price, $/Barrel\")\nax.legend()\n	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))\nax.set_ylabel(\"Brent oil price, USD / Barrel\")\nplt.show()\n\n\n#prices from NPD\ntot_prod=pd.read_csv(\"http://factpages.npd.no/ReportServer?/FactPages/TableView/field_production_totalt_NCS_month__DisplayAllRows&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.56&CultureCode=nb-no\")\ntot_prod.columns = ['﻿prod_year', 'prod_month', \n'oil_millm3', 'gas_billsm3',\n'ngl_millsm3', 'condensate_millsm3',\n'oe_millsm3', 'water_millsm3']\n\ntot_prod[\"date\"] = pd.to_datetime(tot_prod.loc[:, '﻿prod_year'].astype(str) + tot_prod.loc[:,\"prod_month\"].astype(str),\n	format = \"%Y%m\")\n\nprod_include = ['date', 'oil_millm3', 'gas_billsm3','water_millsm3']\ntot_prod = tot_prod[prod_include]\n\ntot_prod_long = pd.melt(tot_prod, id_vars =[\"date\"])\ntot_prod_long[\"value\"] = tot_prod_long.value.astype(float)\ntot_prod_long = tot_prod_long[tot_prod_long.value!=0]\n\ndef smooth_series(srs):\n	x_range = [i for i in range(len(srs))]\n	smoothed = sm.nonparametric.lowess(srs,x_range, frac=0.1)\n	return(pd.Series(smoothed[:,1]))\n\nsmoothed = tot_prod_long.groupby(\"variable\")[\"value\"].transform(smooth_series)\ntot_prod_long[\"smoothed\"] = smoothed\n\nfig, ax = plt.subplots()\nprod_by_liquid = tot_prod_long.groupby(\"variable\")\nfor liquid in prod_by_liquid:\n	ax.plot(liquid[1].date, liquid[1].value, label=liquid[0])\nfor liquid in prod_by_liquid:\n	ax.plot(liquid[1].date, liquid[1].smoothed)\nax.legend()\n#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))\nax.set_ylabel(\"Production\")\nplt.show()\n\n#in MillSm3\n\ninvestments<-read.csv(\"http://factpages.npd.no/ReportServer?/FactPages/TableView/field_investment_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en\", stringsAsFactors=FALSE)\nreserves<-read.csv(\"http://factpages.npd.no/ReportServer?/FactPages/TableView/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en\", stringsAsFactors=FALSE)\n\nmonth.prod<-read.csv(\"http://factpages.npd.no/ReportServer?/FactPages/TableView/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.56&CultureCode=nb-no\", stringsAsFactors=FALSE)\n\n\n\n\n",
 			"file": "ssb_data.py",
-			"file_size": 14476,
-			"file_write_time": 1447604050000000,
 			"settings":
 			{
-				"buffer_size": 14436,
+				"buffer_size": 15045,
 				"line_ending": "Unix"
 			}
 		},
@@ -196,10 +193,15 @@
 			}
 		},
 		{
+			"contents": "notes.txt\n\nsources:\nhttp://www.norges-bank.no/Upload/HMS/house_price_index/p1c9.xlsx",
+			"file": "notes.txt",
+			"file_size": 11,
+			"file_write_time": 1447683142000000,
 			"settings":
 			{
-				"buffer_size": 0,
-				"line_ending": "Unix"
+				"buffer_size": 84,
+				"line_ending": "Unix",
+				"name": "notes.txt"
 			}
 		}
 	],
@@ -465,7 +467,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -473,15 +475,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 14436,
+						"buffer_size": 15045,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13492,
-								13492
+								11888,
+								11888
 							]
 						],
 						"settings":
@@ -490,7 +492,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 12632.0,
+						"translation.y": 3030.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -554,21 +556,23 @@
 				},
 				{
 					"buffer": 3,
+					"file": "notes.txt",
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 84,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								84,
+								84
 							]
 						],
 						"settings":
 						{
+							"auto_name": "notes.txt",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,

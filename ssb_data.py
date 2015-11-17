@@ -21,11 +21,15 @@ pd.options.display.max_columns = 100
 plt.rcParams['xtick.labelsize'] = 14
 plt.rcParams['ytick.labelsize'] = 14
 plt.rcParams["axes.labelsize"]= 20
-plt.rcParams["figure.facecolor"] = "#f2f2f2"
 #plt.rcParams['figure.savefig.dpi'] = 100
 plt.rcParams['savefig.edgecolor'] = "#f2f2f2"
 plt.rcParams['savefig.facecolor'] ="#f2f2f2"
 plt.rcParams["figure.figsize"] = [15,8]
+plt.rcParams['savefig.bbox'] = "tight"
+plt.rcParams['font.size'] = 20
+greens = ['#66c2a4','#41ae76','#238b45','#006d2c','#00441b']
+multi =['#66c2a4','#1f78b4','#a6cee3','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f']
+plt.rcParams["axes.color_cycle"] = multi
 #functions:
 
 #show categories in a json file
@@ -139,6 +143,10 @@ plt.show()
 
 
 
+
+
+
+
 #Bankruptcies***************************
 
 def show_categories(json_data):
@@ -185,7 +193,16 @@ fig.savefig("figures/bank_plot.png")
 plt.show()
 
 
+
+
+
+
+
+
+
+
 #Boligpriser
+
 
 house_prices = pd.read_csv("https://data.ssb.no/api/v0/dataset/1060.csv?lang=no", sep=";", header=0)
 house_prices.columns = ['region', 'type', 'time', 'variable','value']
@@ -217,8 +234,6 @@ cities = new_names[0:4]
 house_prices_cities = house_prices[house_prices.region.isin(cities)]
 total_cities = house_prices_cities[house_prices_cities.type == "00 Boliger i alt"]
 
-#blah
-
 start = datetime.strptime('01012005', '%d%m%Y')
 end = datetime.strptime('01012015', '%d%m%Y')
 total_cities = total_cities[total_cities.time>=start]
@@ -234,6 +249,31 @@ ax.set_ylabel("Housing Prices, index, 2005 = 100", size=14)
 fig.set_size_inches(11,7)
 fig.savefig("figures/city_housing_prices.png")
 plt.show()
+
+
+
+
+#Housing: long time series from norgesbank
+#1912 = 100
+xls_housing = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/house_price_index/p1c9.xlsx")
+house_prices_l = xls_housing.parse('Table_A1', header=2)
+house_prices_l.columns = ["year", "total", "oslo", "bergen", "trondheim", "kristiansand"]
+house_prices_l = house_prices_l.iloc[:-15,:]
+
+house_prices_melt = pd.melt(house_prices_l, id_vars="year")
+house_prices_melt["value"][house_prices_melt.value==" "] = np.nan
+house_prices_melt["value"] =house_prices_melt.value.astype(float)
+
+fig, ax = plt.subplots()
+hp_by_city = house_prices_melt.groupby("variable")
+for city_price in hp_by_city:
+	ax.plot(city_price[1].year, city_price[1].value, label=city_price[0])
+	ax.text(2016, np.array(city_price[1].value)[-2], city_price[0])
+ax.legend()
+ax.set_ylabel("Houseprice index, 1912=100, log scale")
+plt.show()
+
+
 
 #credit
 debt_json = pd.read_json("https://data.ssb.no/api/v0/dataset/62264.json?lang=no")
@@ -346,6 +386,18 @@ fig.set_size_inches(15,8)
 plt.show()
 
 
+#Interest rates
+ir=pd.read_csv("http://www.norges-bank.no/WebDAV/stat/en/renter/v2/renter_mnd.csv")
+
+
+#Trade and exchange
+
+#exchange rate
+pd.ExcelFile("http://www.norges-bank.no/en/Statistics/Historical-monetary-statistics/Historical-exchange-rates/"
+
+xls_exchange = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/historical_exchange_rates/p1_c7.xlsx")
+exchange_rates = xls_exchange.parse('p1_c7_Table_A2', header=2)
+
 
 #oil and gas
 
@@ -393,7 +445,6 @@ fig, ax = plt.subplots()
 prod_by_liquid = tot_prod_long.groupby("variable")
 for liquid in prod_by_liquid:
 	ax.plot(liquid[1].date, liquid[1].value, label=liquid[0])
-plt.gca().set_color_cycle(None)
 for liquid in prod_by_liquid:
 	ax.plot(liquid[1].date, liquid[1].smoothed)
 ax.legend()
@@ -403,10 +454,20 @@ plt.show()
 
 #in MillSm3
 
-investments<-read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_investment_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en", stringsAsFactors=FALSE)
-reserves<-read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en", stringsAsFactors=FALSE)
+#Investments in oil/gas
+investments=pd.read_csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_investment_yearly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en")
 
-month.prod<-read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.56&CultureCode=nb-no", stringsAsFactors=FALSE)
+tot_investments = investments.groupby("prfYear")['prfInvestmentsMillNOK'].aggregate(sum)
+tot_investments = tot_investments.reset_index()
+tot_investments.columns = ["year", "invest_millNOK"]
+tot_investments = tot_investments[tot_investments.invest_millNOK!=0]
+
+fig, ax = plt.subplots()
+ax.bar(tot_investments.year, tot_investments.invest_millNOK)
+plt.show()
+
+
+reserves=reserves = read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en", stringsAsFactors=FALSE)
 
 
 
