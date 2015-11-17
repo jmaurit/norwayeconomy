@@ -147,6 +147,8 @@ plt.show()
 
 
 
+
+
 #Bankruptcies***************************
 
 def show_categories(json_data):
@@ -249,6 +251,8 @@ ax.set_ylabel("Housing Prices, index, 2005 = 100", size=14)
 fig.set_size_inches(11,7)
 fig.savefig("figures/city_housing_prices.png")
 plt.show()
+
+
 
 
 
@@ -377,7 +381,6 @@ firms_inc = ["L201 Statlige l�neinstitutter",
 fig, ax = plt.subplots()
 firms_by_source = firms.groupby("credit_source")
 for source in firms_by_source:
-	print(source[0])
 	ax.plot(source[1].time, source[1].value, label=source[0])
 ax.legend()
 	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
@@ -386,10 +389,67 @@ fig.set_size_inches(15,8)
 plt.show()
 
 
+
+
+
+
+
 #Interest rates
+#Norwegian Overnight Weighted Average rate.
+
 ir=pd.read_csv("http://www.norges-bank.no/WebDAV/stat/en/renter/v2/renter_mnd.csv")
 
+ir["DATES"] = [datetime.strptime(d, "%b-%y") for d in ir.DATES]
 
+ir.columns = ['date', 'folio_nom', 'res_nom', 'dlaan_nom',
+	   'statskvl_3m_eff','statskvl_6m_eff', 'statskvl_9m_eff', 
+	   'statskvl_12m_eff','statsobl_3y_eff', 'statsobl_5y_eff', 
+	   'statsobl_10y_eff', 'nowa_rt','nowa_vl']
+
+
+
+include = ['date','dlaan_nom', 'statskvl_3m_eff', 'statskvl_12m_eff', 'statsobl_10y_eff']
+ir = ir[include]
+
+ir_long = pd.melt(ir, id_vars="date")
+ir_long["value"][ir_long.value=="ND"] = np.nan
+ir_long["value"] = ir_long.value.astype(float)
+
+fig, ax = plt.subplots()
+for r in ir_long.groupby("variable"):
+	ax.plot(r[1].date, r[1].value, label=r[0])
+ax.legend()
+plt.show()
+
+
+
+nibor = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/short_term_interest_rates/NIBOR_dag_mnd_aar.xlsx")
+long_ir = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/short_term_interest_rates/p2_c1-c7.xlsx")
+real_ir = long_ir.parse('p2c7_table_7B1',header=2)
+real_ir = real_ir.iloc[:-13,:]
+real_ir.Year = real_ir.Year.astype(float)
+
+rir_include = ['Year', 'Real marginal rate', 'Real deposit rate', 'Real loans rate',
+       'Real bond yield']
+
+inflation_include = ['Year', 'Inflation rate', 'Smoothed inflation rate']
+
+inflation = real_ir[inflation_include]
+real_ir = real_ir[rir_include]
+
+real_ir_long = pd.melt(real_ir, id_vars="Year")
+fig, ax = plt.subplots()
+for r in real_ir_long.groupby("variable"):
+	ax.plot(r[1].Year, r[1].value, label=r[0])
+ax.legend()
+plt.show()
+
+inflation_long = pd.melt(inflation, id_vars="Year")
+fig, ax = plt.subplots()
+for i in inflation_long.groupby("variable"):
+	ax.plot(i[1].Year, i[1].value, label=i[0])
+ax.legend()
+plt.show()
 #Trade and exchange
 
 #exchange rate
@@ -399,6 +459,24 @@ xls_exchange = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/historical_exc
 exchange_rates = xls_exchange.parse('p1_c7_Table_A2', header=2)
 
 
+#wages
+
+wages = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/wages_by_industry/p2c6_7.xlsx")
+tot_wages = wages.parse('Table_total', header=2)
+ind_wages = wages.parse('Table_6A4', header=3)
+
+#total wages
+tot_wages = tot_wages.iloc[:-12,:]
+tot_wages["Year"][tot_wages.Year=="2014*"] = "2014"
+tot_wages["Year"] = tot_wages.Year.astype(int)
+
+tot_wages_long = pd.melt(tot_wages, id_vars="Year")
+
+fig, ax = plt.subplots()
+for wage in tot_wages_long.groupby("variable"):
+	ax.plot(wage[1].Year, wage[1].value, label=wage[0])
+ax.legend()
+plt.show()
 #oil and gas
 
 #prices from eia

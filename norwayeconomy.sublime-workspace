@@ -171,7 +171,7 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 15045,
+				"buffer_size": 16063,
 				"line_ending": "Unix"
 			}
 		},
@@ -179,7 +179,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 4746,
+				"buffer_size": 6402,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -475,15 +475,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 15045,
+						"buffer_size": 16063,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11888,
-								11888
+								979,
+								979
 							]
 						],
 						"settings":
@@ -492,7 +492,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3030.0,
+						"translation.y": 1415.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -502,15 +502,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 4746,
+						"buffer_size": 6402,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1061,
-								1061
+								0,
+								0
 							]
 						],
 						"settings":
@@ -521,7 +521,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1310.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -549,7 +549,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 7.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
