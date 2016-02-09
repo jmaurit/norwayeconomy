@@ -171,15 +171,42 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 16063,
+				"buffer_size": 18290,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "maps.py",
+			"settings":
+			{
+				"buffer_size": 7658,
+				"line_ending": "Unix",
+				"name": "maps.py"
+			}
+		},
+		{
+			"file": "kommune_clean.py",
+			"settings":
+			{
+				"buffer_size": 1734,
+				"line_ending": "Unix",
+				"name": "kommune_clean.py"
+			}
+		},
+		{
+			"file": "maps_notes.txt",
+			"settings":
+			{
+				"buffer_size": 201,
+				"line_ending": "Unix",
+				"name": "maps_notes.txt"
 			}
 		},
 		{
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 6402,
+				"buffer_size": 8146,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -352,6 +379,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"value",
+			"df_shape",
+			"df_new_rew",
+			"ix",
 			"household",
 			"source",
 			"household",
@@ -410,6 +441,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"folkevekst_perc",
+			"df_folkevekst15",
+			"folkevekst15",
 			"firms",
 			"currency",
 			"debt",
@@ -467,7 +501,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -475,15 +509,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 16063,
+						"buffer_size": 18290,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								979,
-								979
+								14560,
+								14560
 							]
 						],
 						"settings":
@@ -492,25 +526,108 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1415.0,
+						"translation.y": 5041.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "index.html",
+					"file": "maps.py",
 					"settings":
 					{
-						"buffer_size": 6402,
+						"buffer_size": 7658,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								2178,
+								2256
+							]
+						],
+						"settings":
+						{
+							"auto_name": "maps.py",
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1882.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "kommune_clean.py",
+					"settings":
+					{
+						"buffer_size": 1734,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1633,
+								1633
+							]
+						],
+						"settings":
+						{
+							"auto_name": "kommune_clean.py",
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 955.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "maps_notes.txt",
+					"settings":
+					{
+						"buffer_size": 201,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								199,
+								199
+							]
+						],
+						"settings":
+						{
+							"auto_name": "maps_notes.txt",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "index.html",
+					"settings":
+					{
+						"buffer_size": 8146,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2634,
+								2634
 							]
 						],
 						"settings":
@@ -521,13 +638,13 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1310.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 5,
 					"file": "website.css",
 					"settings":
 					{
@@ -549,13 +666,13 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 6,
 					"file": "notes.txt",
 					"settings":
 					{

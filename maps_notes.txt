@@ -1,0 +1,7 @@
+maps_notes.txt
+
+get geoJSON files on administrative boundaries from kartverket
+convert to shapefiles with online tool: http://www.mapshaper.org/
+
+ssb_kommune.csv gives names of kommunes and kommune #
+

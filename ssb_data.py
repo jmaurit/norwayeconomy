@@ -453,14 +453,12 @@ plt.show()
 #Trade and exchange
 
 #exchange rate
-pd.ExcelFile("http://www.norges-bank.no/en/Statistics/Historical-monetary-statistics/Historical-exchange-rates/"
-
 xls_exchange = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/historical_exchange_rates/p1_c7.xlsx")
 exchange_rates = xls_exchange.parse('p1_c7_Table_A2', header=2)
 
 
-#wages
 
+#wages
 wages = pd.ExcelFile("http://www.norges-bank.no/Upload/HMS/wages_by_industry/p2c6_7.xlsx")
 tot_wages = wages.parse('Table_total', header=2)
 ind_wages = wages.parse('Table_6A4', header=3)
@@ -546,6 +544,12 @@ plt.show()
 
 
 reserves=reserves = read.csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_reserves&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.112&CultureCode=en", stringsAsFactors=FALSE)
+
+
+#Import/Export
+#Export of goods:
+exports_by_type = pd.read_csv("https://data.ssb.no/api/v0/dataset/34256.csv?lang=en")
+
 
 
 
