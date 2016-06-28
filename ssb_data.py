@@ -64,7 +64,6 @@ def format_df(df):
 	return(df)
 
 
-
 employment_json = pd.read_json("https://data.ssb.no/api/v0/dataset/1054.json?lang=en")
 
 age_labels = employment_json["dataset"]["dimension"]["Alder"]
@@ -140,7 +139,6 @@ for emp in emp_by_sex:
 ax.set_ylabel("Norwegian Employment, %")
 fig.set_size_inches(11,7)
 plt.show()
-
 
 
 
@@ -392,6 +390,37 @@ plt.show()
 
 
 
+
+#building costs
+apartment_build_cost = pd.read_csv("https://data.ssb.no/api/v0/dataset/1058.csv?lang=no", sep=";", decimal=",")
+building_costs = pd.read_csv("https://data.ssb.no/api/v0/dataset/26944.csv?lang=no", sep=";", decimal=",")
+
+
+apartment_build_cost = apartment_build_cost[apartment_build_cost.arbeidstype=="20 Bustadblokk i alt"]
+yoy_apartbc =  apartment_build_cost[apartment_build_cost.statistikkvariabel=="Endring fr� f�rre �r (prosent)"]
+
+
+apart_bc = apartment_build_cost[apartment_build_cost.statistikkvariabel=="Byggjekostnadsindeks"]
+
+del apart_bc["arbeidstype"]
+del apart_bc["statistikkvariabel"]
+
+del yoy_apartbc["arbeidstype"]
+del yoy_apartbc["statistikkvariabel"]
+
+apart_bc["tid"] = pd.to_datetime(apart_bc.tid, format = "%YM%m")
+
+apart_bc.columns = ["date", "ci"]
+apart_bc["ci"]=apart_bc.ci.apply(lambda x: x.replace(",","."))
+apart_bc["ci"] = apart_bc.ci.astype(float)
+
+fig, ax = plt.subplots()
+ax.plot(apart_bc.date, apart_bc.ci)
+ax.legend()
+	#ax.annotate(sect[0], xy=(start, np.array(sect[1].value[0])+5 ))
+ax.set_ylabel("Building Cost Index")
+fig.set_size_inches(15,8)
+plt.show()
 
 
 #Interest rates

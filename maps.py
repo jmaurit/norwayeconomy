@@ -243,3 +243,9 @@ df_folkevekst15.apply(add_polys, axis=1)
 plt.show()
 
 
+#building costs
+https://data.ssb.no/api/v0/dataset/1058.csv?lang=no
+
+
+
+
