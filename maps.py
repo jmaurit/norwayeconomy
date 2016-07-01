@@ -243,9 +243,26 @@ df_folkevekst15.apply(add_polys, axis=1)
 plt.show()
 
 
-#building costs
-https://data.ssb.no/api/v0/dataset/1058.csv?lang=no
+
+#Data on county moving
+
+pop_dyr =  pd.read_csv("http://data.ssb.no/api/v0/dataset/49577.csv?lang=no", sep=";")
+
+folkemengde = pop_dyr[pop_dyr.statistikkvariabel=="Folkemengde"]
+folkemengde.columns = ["region", "date", "variable", "population"]
+       'Folkemengde 1. januar og endringer i kalender�ret, etter region, tid og statistikkvariabel'
+folkemengde["population"] = folkemengde.population.astype(float)
+
+def first_diff(block, periods):
+  diff_block = block.diff(periods)
+  return(diff_block)
 
 
-
+pop_diff=folkemengde.groupby("region")["population"].transform(first_diff, 1)
+pop_diff5 = folkemengde.groupby("region")["population"].transform(first_diff, 5)
+folkemengde["pop_diff"] = pop_diff
+folkemengde["pop_diff5"] = pop_diff5 
+folkemengde = folkemengde[folkemengde.pop_diff.notnull()]
+folkemengde["perc_diff"] = folkemengde.pop_diff/folkemengde.population*100
+folkemengde["perc_diff5"] = folkemengde.pop_diff5/folkemengde.population*100
 
