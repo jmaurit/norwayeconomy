@@ -64,6 +64,63 @@ def format_df(df):
 	return(df)
 
 
+laks_eksport = pd.read_csv("http://data.ssb.no/api/v0/dataset/1122.csv?lang=no", sep=";")
+
+#Demographics - immigration:
+
+pop = pd.read_csv("http://data.ssb.no/api/v0/dataset/49626.csv?lang=no", sep=";")
+
+pop.columns = ["region", "year", "variable", "value"]
+pop = pop[["year", "variable", "value"]]
+pop_tot = pop[pop.variable=="Folkemengde"]
+pop_tot = pop_tot[["year", "value"]]
+pop_tot.columns = ["year", "pop_tot"]
+
+innvandring = pd.read_csv("http://data.ssb.no/api/v0/dataset/48651.csv?lang=no", sep=";")
+innvandring.columns = ['region', 'kjoenn', 'landbakgrunn', 'year', 'statistikkvariabel',
+       'innvandrer']
+innvandring = innvandring[['kjoenn', 'landbakgrunn', 'year',
+       'innvandrer']]
+innvandring = innvandring.merge(pop_tot, on="year", how ="left")
+innvandring["pros_innvan"] = innvandring["innvandrer"]/innvandring["pop_tot"]*100
+
+total = innvandring.groupby(["year", "landbakgrunn"])["pros_innvan"].aggregate(sum)
+total = total.reset_index()
+total_w = total.pivot(index="year", columns="landbakgrunn", values="pros_innvan")
+Y = np.array(total_w)
+x=total.year.unique()
+fig, ax = plt.subplots()
+ax.stackplot(x, Y.T)
+plt.show()
+#Demographics - population:
+
+fm5aar=pd.read_csv("http://data.ssb.no/api/v0/dataset/65195.csv?lang=no", sep=";")
+fm5aar.columns = ['alder', 'kjoenn', 'tid', 'statistikkvariabel',
+       'personer']
+fm5aar["alder"] = [i.split(" ")[1] for i in fm5aar.alder]
+
+
+totalt = fm5aar[fm5aar.kjoenn == "0 Begge kj�nn"]
+
+totalt_fm5 = totalt[["tid", "alder", "personer"]]
+totalt_fm5_w = totalt_fm5.pivot(index='tid', columns='alder', values='personer')
+totalt_fm5_w.columns.values
+totalt_fm5_w = totalt_fm5_w[['0-4','5-9', '10-14','15-19', '20-24', '25-29', '30-34', '35-39',
+       '40-44', '45-49',  '50-54', '55-59', '60-64', '65-69',
+       '70-74', '75-79', '80-84', '85-89', '90-94', '95-99', '100']]
+
+Y = np.array(totalt_fm5_w)
+
+dates = totalt_fm5.tid.unique()
+
+fig, ax = plt.subplots()
+ax.stackplot(dates, Y.T)
+
+plt.show()
+
+
+
+#employment
 employment_json = pd.read_json("https://data.ssb.no/api/v0/dataset/1054.json?lang=en")
 
 age_labels = employment_json["dataset"]["dimension"]["Alder"]

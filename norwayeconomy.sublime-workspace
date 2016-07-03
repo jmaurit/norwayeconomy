@@ -171,15 +171,12 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 19393,
+				"buffer_size": 20914,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "#http://ramiro.org/notebook/basemap-choropleth/\n\nimport matplotlib as mpl\nimport matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd\nfrom pyjstat import pyjstat #for reading json-stat format\nimport requests\nfrom collections import OrderedDict\n\nfrom geonamescache import GeonamesCache\n#from helpers import slug\nfrom matplotlib.patches import Polygon\nfrom matplotlib.collections import PatchCollection\nfrom mpl_toolkits.basemap import Basemap\n\npd.options.display.max_rows = 999\npd.options.display.max_columns = 50\n\n\ngc = GeonamesCache()\niso3_codes = list(gc.get_dataset_by_key(gc.get_countries(), 'iso3').keys())\n\ndf = pd.read_csv(filename, skiprows=4, usecols=cols)\ndf.set_index('Country Code', inplace=True)\ndf = df.ix[iso3_codes].dropna() # Filter out non-countries and missing values.\n\nvalues = df[year]\ncm = plt.get_cmap('Greens')\nscheme = [cm(i / num_colors) for i in range(num_colors)]\nbins = np.linspace(values.min(), values.max(), num_colors)\ndf['bin'] = np.digitize(values, bins) - 1\ndf.sort('bin', ascending=False).head(10)\n\n#mpl.style.use('map')\nfig = plt.figure(figsize=(22, 12))\n\n#ax = fig.add_subplot(111, axisbg='w', frame_on=False)\nax = fig.add_subplot(111)\nfig.suptitle('Forest area as percentage of land area in {}'.format(year), fontsize=30, y=.95)\n\nm = Basemap(lon_0=0, projection='robin')\nm.drawmapboundary(color='w')\n\nm.readshapefile(shapefile, 'units', color='#444444', linewidth=.2)\nfor info, shape in zip(m.units_info, m.units):\n  iso3 = info['ADM0_A3']\n  if iso3 not in df.index:\n      color = '#dddddd'\n  else:\n      color = scheme[df.ix[iso3]['bin']]\n\n  patches = [Polygon(np.array(shape), True)]\n  pc = PatchCollection(patches)\n  pc.set_facecolor(color)\n  ax.add_collection(pc)\n\n# Cover up Antarctica so legend can be placed over it.\nax.axhspan(0, 1000 * 1800, facecolor='w', edgecolor='w', zorder=2)\n\n# Draw color legend.\n#left, bottom, width, height\nax_legend = fig.add_axes([0.90, 0.10, 0.03, 0.4], zorder=3)\ncmap = mpl.colors.ListedColormap(scheme)\ncb = mpl.colorbar.ColorbarBase(ax_legend, cmap=cmap, ticks=bins, boundaries=bins, orientation='vertical')\ncb.ax.set_xticklabels([str(round(i, 1)) for i in bins])\n\n# Set the map footer.\nplt.annotate(descripton, xy=(-1.85, -3.2), size=14, xycoords='axes fraction')\n\nplt.show()\n\n\n#maps.py\n#global administrative areas\n#http://www.gadm.org/download\nfrom mpl_toolkits.basemap import Basemap\nimport matplotlib.pyplot as plt\nfrom matplotlib.patches import Polygon\nfrom matplotlib.collections import PatchCollection\nfrom matplotlib.patches import PathPatch\nimport numpy as np\nimport pandas as pd\n\n#from BeautifulSoup import BeautifulSoup\n\n#import data on housing prices by county\nhouse_prices = pd.read_csv(\"https://data.ssb.no/api/v0/dataset/25138.csv?lang=no\", sep=\";\")\nhouse_prices.columns = [\"region\", \"type\", \"year\", \"variable\", \"price_sq_m\"]\n\nhouse_prices = house_prices[house_prices.type==\"02 Brukte eneboliger\"]\nhouse_prices = house_prices[house_prices.variable == \"Kvadratmeterpris (kr)\"]\nhouse_prices = house_prices[house_prices.year==2014]\n\nfylke = house_prices.region.values\n\nfylke2 = [\"Østfold\", \"Akershus\", \"Oslo\", \"Hedmark\",\n \"Oppland\", \"Buskerud\", \"Vestvold\", \"Telemark\", \"Aust-Agder\",\n  \"Vest-Agder\", \"Rogaland\", \"Hordaland\", \"Sogn og Fjordane\", \n  \"Møre og Romsdal\", \"Sør-Trøndelag\", \"Nord-Trøndelag\", \"Nordland\", \n  \"Troms\", \"Finnmark\"] \nfylke_dict = dict(zip(fylke, fylke2))\n\nhouse_prices[\"counties\"] = [fylke_dict[county] for county in house_prices.region]\ndel house_prices[\"region\"]\n[\"price_sq_m\", \"counties\"]\n\n\nfig=plt.figure(figsize=(15,10))\nax  = fig.add_subplot(111)\n\n#map instance\nm = Basemap(llcrnrlon=3.,llcrnrlat=57.,\\\n      urcrnrlon=33.,urcrnrlat=72.,\\\n            resolution='i',projection='merc')\n            #lat_0=2.5,lon_0=58.)\n\nm.readshapefile('norway_shape/NOR_adm_shp/NOR_adm0', \"norway\")\nm.readshapefile('norway_shape/NOR_adm_shp/NOR_adm1', \"counties\")\n\nshapes=[]\nnames = []\nfor info, shape in zip(m.counties_info, m.counties):\n  shapes.append(shape)\n  names.append(info[\"NAME_1\"])\n\nnames_series = pd.Series(names)\nnames_series = names_series[~names_series.duplicated()]\n\nnames_series2 = [\"Østfold\"]\nfor f in names_series[1:]:\n  names_series2.append(f)\n\nshape_fylke_dict2 = dict(zip(names_series, names_series2))\n\n#now create dataframe with shapefiles and names\ndf_shape = pd.DataFrame()\ndf_shape[\"counties\"] = [shape_fylke_dict2[name] for name in names]\ndf_shape[\"shapes\"] = shapes\n\ndf_shape = df_shape.merge(house_prices[[\"price_sq_m\", \"counties\"]], on=\"counties\")\ndf_shape[\"price_sq_m\"] = df_shape[\"price_sq_m\"].astype(float)\n\n#create different colors\nnum_colors = 9\nvalues = df_shape[\"price_sq_m\"]\ncm = plt.get_cmap('Greens')\nscheme = [cm(i / num_colors) for i in range(num_colors)]\nbins = np.linspace(values.min(), values.max(), num_colors)\ndf_shape['bin'] = np.digitize(values, bins) - 1\n#df.sort('bin', ascending=False).head(10)\n\ndef add_polys(shape_row):\n  color = scheme[shape_row.bin]\n  patches = [Polygon(np.array(shape_row.shapes), True)]\n  pc = PatchCollection(patches)\n  pc.set_facecolor(color)\n  ax.add_collection(pc) \n\ndf_shape.apply(add_polys, axis=1)\n\nplt.show()\n\n\n#add municipalities:\n#innflytting siste 9 kvartaler\n#new_res = pd.read_csv(\"https://data.ssb.no/api/v0/dataset/1106.csv?lang=eng\", sep=\";\")\n\n\n\nres_url = \"https://data.ssb.no/api/v0/dataset/1106.json?lang=no\"\ndata = requests.get(res_url)\nres_data = pyjstat.from_json_stat(data.json(object_pairs_hook=OrderedDict))\n\nnew_res = res_data[0]\nnew_res.columns = [\"princ\", \"variable\", \"quarter\", \"value\"]\nfolkevekst = new_res[new_res.variable==\"Folkevekst\"]\nfolkevekst15 = folkevekst[folkevekst.quarter == \"2015K3\"]\nfolketall = new_res[new_res.variable ==\"Folketalet ved utgangen av kvartalet\"]\nfolketall15 = folketall[folketall.quarter ==\"2015K3\"]\nfolkevekst15 = folkevekst15.merge(folketall15[[\"princ\", \"value\"]], on=\"princ\")\nfolkevekst15.columns = [\"princ\", \"variable\", \"quarter\", \"folkevekst\", \"folketall\"]\nfolkevekst15[\"folkevekst_perc\"] = 100* folkevekst15.folkevekst/folkevekst15.folketall\n\n#get kommune num to match with shape data\nssb_kommune = pd.read_csv(\"ssb_kommune.csv\")\ndel ssb_kommune[\"Unnamed: 0\"]\nssb_kommune.columns =[\"kode\", \"princ\"]\n\nfolkevekst15 = folkevekst15.merge(ssb_kommune, on=\"princ\", how=\"left\")\n\n\n\n\nfig=plt.figure(figsize=(15,10))\nax  = fig.add_subplot(111)\n\n#map instance\nm = Basemap(llcrnrlon=3.,llcrnrlat=57.,\\\n      urcrnrlon=33.,urcrnrlat=72.,\\\n            resolution='i',projection='merc')\n            #lat_0=2.5,lon_0=58.)\n\nm.readshapefile('norway_shape/NOR_adm_shp/NOR_adm0', \"norway\")\nm.readshapefile('norway_shape/kartverket/kommuner/kommuner', \"princ\", drawbounds=False)\n\nshapes=[]\nkode = []\nnames = []\nfor info, shape in zip(m.princ_info, m.princ):\n  shapes.append(shape)\n  kode.append(info[\"komm\"])\n  names.append(info[\"navn\"])\n\ndf_folkevekst15 = pd.DataFrame()\ndf_folkevekst15[\"shapes\"] = shapes\ndf_folkevekst15[\"kode\"] = kode\n\n#merge with ssb data\ndf_folkevekst15 = df_folkevekst15.merge(folkevekst15, on=\"kode\", how=\"left\")\n\n#create different colors for map\nnum_colors = 20\nvalues = df_folkevekst15[\"folkevekst_perc\"].astype(float)\ncm = plt.get_cmap('Greens')\nscheme = [cm(i / num_colors) for i in range(num_colors)]\nbins = np.linspace(values.min(), values.max(), num_colors)\ndf_folkevekst15['bin'] = np.digitize(values, bins) - 1\ndf_folkevekst15.sort_values('bin', ascending=False).head(10)\n\ndef add_polys(shape_row):\n  color = scheme[shape_row.bin]\n  patches = [Polygon(np.array(shape_row.shapes), True)]\n  pc = PatchCollection(patches)\n  pc.set_facecolor(color)\n  ax.add_collection(pc) \n\ndf_folkevekst15.apply(add_polys, axis=1)\n\n\n#princ_dict = dict(zip(shape_princ.values, data_princ.values))\n\nplt.show()\n\n\n\n#Data on county moving\n\npop_dyr =  pd.read_csv(\"http://data.ssb.no/api/v0/dataset/49577.csv?lang=no\", sep=\";\")\n\nfolkemengde = pop_dyr[pop_dyr.statistikkvariabel==\"Folkemengde\"]\nfolkemengde.columns = [\"region\", \"date\", \"variable\", \"population\"]\n       'Folkemengde 1. januar og endringer i kalender�ret, etter region, tid og statistikkvariabel'\nfolkemengde[\"population\"] = folkemengde.population.astype(float)\n\ndef first_diff(block, periods):\n  diff_block = block.diff(periods)\n  return(diff_block)\n\n\npop_diff=folkemengde.groupby(\"region\")[\"population\"].transform(first_diff, 1)\npop_diff5 = folkemengde.groupby(\"region\")[\"population\"].transform(first_diff, 5)\nfolkemengde[\"pop_diff\"] = pop_diff\nfolkemengde[\"pop_diff5\"] = pop_diff5 \nfolkemengde = folkemengde[folkemengde.pop_diff.notnull()]\nfolkemengde[\"perc_diff\"] = folkemengde.pop_diff/folkemengde.population*100\nfolkemengde[\"perc_diff5\"] = folkemengde.pop_diff5/folkemengde.population*100\n\n",
 			"file": "maps.py",
-			"file_size": 8658,
-			"file_write_time": 1467315894000000,
 			"settings":
 			{
 				"buffer_size": 8602,
@@ -209,7 +206,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 8047,
+				"buffer_size": 8457,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -504,7 +501,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -512,15 +509,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 19393,
+						"buffer_size": 20914,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15219,
-								15219
+								2645,
+								2074
 							]
 						],
 						"settings":
@@ -529,7 +526,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 14884.0,
+						"translation.y": 1881.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -546,8 +543,8 @@
 						"selection":
 						[
 							[
-								7683,
-								8601
+								8158,
+								8158
 							]
 						],
 						"settings":
@@ -558,7 +555,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8182.0,
+						"translation.y": 8165.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -622,15 +619,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 8047,
+						"buffer_size": 8457,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7947,
-								7947
+								7080,
+								7080
 							]
 						],
 						"settings":
@@ -641,7 +638,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8479.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
