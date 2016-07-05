@@ -49,20 +49,193 @@ def convert_datetime(date_series):
 	if "M" in date_series[0]:
 		time = date_series.apply(lambda x: x.replace("M",""))
 		new_date_series = pd.to_datetime(time, format='%Y%m')
-		return(new_date_series)
+	return(new_date_series)
 
 def format_df(df):
 	"""
 	columns should be labeled with "time" for the date and 
 	"value" for the date. 
 	inserts na values and converts value to float type. 
-
 	"""
 	df["time"] = convert_datetime(df.time)
 	df["value"][df.value == ".."] =np.nan
 	df["value"] = df.value.astype(float)
 	return(df)
 
+#Nasjonalregnskap
+
+NR=pd.read_csv("http://data.ssb.no/api/v0/dataset/59022.csv", 
+         sep=";", decimal=",", na_values = [".", ".."])
+NR.columns = ["variabel", "kvartal", "enhet", "verdi"]
+
+NR["kvartal"]  = convert_datetime(NR.kvartal) #fra zoo
+
+#sesong justert
+NRSA = NR[NR.enhet == "Faste 2013-priser, sesongjustert (mill. kr)"]
+
+#enhet "Faste 2013-priser, sesongjustert (mill. kr)"
+NRSA = NRSA[["variabel", "kvartal", "verdi"]]
+
+#use tidyr to split
+kateg = NRSA.variabel.str.split('.', n=1).str[0]
+variabel = NRSA.variabel.str.split(' ', n=1).str[1]
+
+NRSA["kateg"] = kateg
+NRSA["variabel"] = variabel
+
+#investering
+
+investering = NRSA[NRSA.kateg =="bif"]
+del investering["kateg"]
+invest_w = investering.pivot(index='kvartal', columns='variabel', values='verdi')
+
+invest_var = ['Total Investment', 'Fixed Assets',
+       'Mainland Norway',
+       'Foreign Shipping',
+       'Extraction',
+       'Mainland Norway, excl public sector',
+       'Housing',
+       'Private Sector',
+       'Public Sector',
+       'Other services',
+       'Other production',
+       'Industry and Mining',
+       'Extraction Services']
+
+invest_w.columns = invest_var
+
+invest_stack = invest_w[["Extraction", "Housing", "Public Sector", 'Mainland Norway', "Total Investment"]]
+invest_stack["Other"] = invest_stack["Total Investment"] - invest_stack[["Extraction", "Housing", "Public Sector", 'Mainland Norway']].sum(axis=1)
+
+del invest_stack["Total Investment"]
+
+# invest_stack.reset_index(inplace=True)
+
+# invest_stack = pd.melt(invest_stack, id_vars = "kvartal")
+
+annotate = pd.dataframe()
+
+Y = np.array(invest_stack)
+
+dates = investering.kvartal.unique()
+
+fig, ax = plt.subplots()
+ax.stackplot(dates, Y.T)
+plt.show()
+
+
+#Se på eksport or import
+
+eksport = NRSA[NRSA.kateg == "eks"]
+del eksport["kateg"]
+eksport_w = eksport.pivot(index='kvartal', columns='variabel', values='verdi')
+eksport_w.columns =['Total', 'Oil and Gas',
+       'Ships and Platforms', 'Services',
+       'Traditional Commodities']
+eksport_stack = eksport_w
+del eksport_stack["Total"]
+
+
+Y = np.array(eksport_stack)
+
+dates = eksport_stack.index.values
+
+fig, ax = plt.subplots()
+ax.stackplot(dates, Y.T)
+plt.show()
+
+#imports
+
+imports =  NRSA[NRSA.kateg == "imp"]
+
+del imports["kateg"]
+imports_w = imports.pivot(index='kvartal', columns='variabel', values='verdi')
+imports_w.columns =['Total', 'Oil and Gas',
+       'Ships and Platforms', 'Services',
+       'Other Goods']
+
+imports_stack = imports_w
+del imports_stack["Total"]
+
+
+Y = np.array(imports_stack)
+
+dates = imports_stack.index.values
+
+fig, ax = plt.subplots()
+ax.stackplot(dates, Y.T)
+plt.show()
+
+
+#Privat og offentlig konsum
+
+pkon = NRSA[NRSA.kateg=="koh"]
+
+del pkon["kateg"]
+pkon_w = pkon.pivot(index='kvartal', columns='variabel', values='verdi')
+pkon_w.columns =['Household and Nonprofit',
+       'Household', 'Household Foreign Consumption',
+       'Services', 'Foreigners Consumption in Norway', 'Goods']
+
+pkon_stack = pkon_w[['Services', 'Goods']]
+
+
+Y = np.array(pkon_stack)
+
+dates = pkon_stack.index.values
+
+fig, ax = plt.subplots()
+ax.stackplot(dates, Y.T)
+plt.show()
+
+
+okon = NRSA[NRSA.kateg=="koo"]
+
+del okon["kateg"]
+okon_w = okon.pivot(index='kvartal', columns='variabel', values='verdi')
+okon_w.columns =['Public sector', 
+	  'Principalities',
+       'State',
+       'State, Military',
+       'State, Civil']
+
+okon_stack = okon_w[['Principalities',
+       'State, Military',
+       'State, Civil']]
+
+Y = np.array(okon_stack)
+
+dates = okon_stack.index.values
+
+fig, ax = plt.subplots()
+ax.stackplot(dates, Y.T)
+plt.show()
+
+bnp = NRSA[NRSA.kateg == "bnpb"]
+bnp = bnp[bnp.variabel=='Bruttonasjonalprodukt, markedsverdi']
+bnp = bnp[["kvartal", "verdi"]]
+bnp.columns = ["kvartal", "bnp"]
+
+okon_stack.reset_index(inplace=True)
+okon_perc = okon_stack.merge(bnp, how="left", on="kvartal")
+okon_perc["State, Military, %GDP"] = okon_perc["State, Military"]/okon_perc["bnp"]*100
+okon_perc["State, Civil, %GDP"] = okon_perc["State, Civil"]/okon_perc["bnp"]*100
+okon_perc["Principalities, %GDP"] = okon_perc["Principalities"]/okon_perc["bnp"]*100
+okon_perc = okon_perc[['kvartal', 'State, Military, %GDP', 'Principalities, %GDP',
+       'State, Civil, %GDP']]
+
+okon_l = pd.melt(okon_perc,id_vars="kvartal")
+
+fig, ax = plt.subplots()
+start = datetime.strptime('01012008', '%d%m%Y')
+okon_by_sector = okon_l.groupby("variable")
+for sector in okon_by_sector:
+	ax.plot(sector[1].kvartal, sector[1].value, label=sector[0])
+	#ax.annotate(unemp[0], xy=(start, np.array(sector[1].value)[0]+1))
+ax.legend()
+ax.set_ylabel("Size of Public Sector, % of GDP")
+#fig.savefig("figures/unemployment.png")
+plt.show()
 
 laks_eksport = pd.read_csv("http://data.ssb.no/api/v0/dataset/1122.csv?lang=no", sep=";")
 

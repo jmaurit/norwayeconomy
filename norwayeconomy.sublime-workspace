@@ -171,7 +171,7 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 20914,
+				"buffer_size": 21369,
 				"line_ending": "Unix"
 			}
 		},
@@ -206,7 +206,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 8457,
+				"buffer_size": 8592,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -379,6 +379,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"tid",
 			"value",
 			"df_shape",
 			"df_new_rew",
@@ -436,11 +437,12 @@
 			"fields_p"
 		],
 		"highlight": true,
-		"in_selection": false,
+		"in_selection": true,
 		"preserve_case": false,
 		"regex": false,
 		"replace_history":
 		[
+			"year",
 			"folkevekst_perc",
 			"df_folkevekst15",
 			"folkevekst15",
@@ -501,7 +503,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -509,15 +511,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 20914,
+						"buffer_size": 21369,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2645,
-								2074
+								3100,
+								2078
 							]
 						],
 						"settings":
@@ -526,7 +528,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1881.0,
+						"translation.y": 2232.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -619,15 +621,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 8457,
+						"buffer_size": 8592,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7080,
-								7080
+								7177,
+								7177
 							]
 						],
 						"settings":
@@ -638,7 +640,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 7419.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
