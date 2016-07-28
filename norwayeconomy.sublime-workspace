@@ -171,7 +171,7 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 21369,
+				"buffer_size": 25974,
 				"line_ending": "Unix"
 			}
 		},
@@ -206,7 +206,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 8592,
+				"buffer_size": 9309,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -379,6 +379,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"pkon",
+			"imports",
+			"eksport",
 			"tid",
 			"value",
 			"df_shape",
@@ -442,6 +445,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"okon",
+			"pkon",
+			"imports",
 			"year",
 			"folkevekst_perc",
 			"df_folkevekst15",
@@ -511,15 +517,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 21369,
+						"buffer_size": 25974,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3100,
-								2078
+								10511,
+								10511
 							]
 						],
 						"settings":
@@ -528,7 +534,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2232.0,
+						"translation.y": 10954.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -621,15 +627,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 8592,
+						"buffer_size": 9309,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7177,
-								7177
+								7364,
+								7364
 							]
 						],
 						"settings":
@@ -640,7 +646,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7419.0,
+						"translation.y": 7752.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

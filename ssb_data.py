@@ -434,6 +434,29 @@ plt.show()
 #Boligpriser
 
 
+#Housing cost_index
+
+cost_index = pd.read_csv("http://data.ssb.no/api/v0/dataset/26944.csv?lang=no", sep=";", decimal=",", na_values=["..", "."])
+cost_index.columns = ['type', 'date', 'variable','index']
+cost_index["variable"].levels
+cost_index["date"] = pd.to_datetime(cost_index.date, format="%YM%m")
+
+tot_cost_index = cost_index[cost_index.type=="01 I alt"]
+del tot_cost_index["type"]
+
+tot_cost_index_w = tot_cost_index.pivot(index="date", columns = "variable", values="index")
+tot_cost_index_w.columns = ['cost index', '% change, mom',
+       '% change, yoy']
+tot_cost_index_w.reset_index(inplace=True)
+
+fig, ax = plt.subplots(2)
+ax[0].plot(tot_cost_index_w.date, tot_cost_index_w["cost index"])
+ax[1].plot(tot_cost_index_w.date, tot_cost_index_w["% change, yoy"])
+plt.show()
+
+okon.pivot(index='kvartal', columns='variabel', values='verdi')
+
+#house prices
 house_prices = pd.read_csv("https://data.ssb.no/api/v0/dataset/1060.csv?lang=no", sep=";", header=0)
 house_prices.columns = ['region', 'type', 'time', 'variable','value']
 time = house_prices.time.apply(lambda x: x.replace("K",""))
@@ -480,10 +503,20 @@ fig.set_size_inches(11,7)
 fig.savefig("figures/city_housing_prices.png")
 plt.show()
 
+#compare prices with costs
+tot_price_index = house_prices[house_prices.type == "00 Boliger i alt"]
+tot_price_index = tot_price_index[tot_price_index.region =="Total"]
+tot_price_index = tot_price_index.pivot(index="time", columns="region", values="value")
+del tot_price_index["type"]
+del tot_price_index["variable"]
+del tot_price_index["region"]
+tot_price_index["% change, yoy"] = tot_price_index.value.pct_change(periods=4)*100
 
-
-
-
+fig, ax = plt.subplots()
+ax.plot(tot_cost_index_w.date, tot_cost_index_w["% change, yoy"])
+ax.plot(tot_price_index.time, tot_price_index["% change, yoy"])
+ax.set_xlim([pd.to_datetime("1993-01-01"), pd.to_datetime("2017-01-01")])
+plt.show()
 
 #Housing: long time series from norgesbank
 #1912 = 100
