@@ -341,6 +341,8 @@ fig.set_size_inches(10,7)
 #fig.savefig("figures/unemployment.png")
 plt.show()
 
+
+
 #employed persons
 emp_perc_sa = employment[employment.contents == "Employed persons in per cent of the population, seasonally adjusted"]
 
@@ -503,7 +505,7 @@ fig.set_size_inches(11,7)
 fig.savefig("figures/city_housing_prices.png")
 plt.show()
 
-#compare prices with costs
+#compare prices with building costs
 tot_price_index = house_prices[house_prices.type == "00 Boliger i alt"]
 tot_price_index = tot_price_index[tot_price_index.region =="Total"]
 tot_price_index = tot_price_index.pivot(index="time", columns="region", values="value")
@@ -517,6 +519,118 @@ ax.plot(tot_cost_index_w.date, tot_cost_index_w["% change, yoy"])
 ax.plot(tot_price_index.time, tot_price_index["% change, yoy"])
 ax.set_xlim([pd.to_datetime("1993-01-01"), pd.to_datetime("2017-01-01")])
 plt.show()
+
+
+#Looking at movement to the cities
+pop = pd.read_csv("http://data.ssb.no/api/v0/dataset/49577.csv?lang=no", sep=";")
+
+
+
+
+#Looking at building in the cities
+bygging = pd.read_csv("http://data.ssb.no/api/v0/dataset/26025.csv?lang=no", sep=";", header=0, decimal=",")
+bygging["region"]=bygging.region.astype('category')
+
+fylker = ['Oestfold', 'Akershus', 'Oslo', 'Hedmark', 'Oppland',
+       'Buskerud', 'Vestfold', 'Telemark', 'Aust-Agder',
+       'Vest-Agder', 'Rogaland', 'Hordaland', 'Sogn og Fjordane',
+       'Moere og Romsdal', 'Soer-Troendelag', 'Nord-Troendelag',
+       'Nordland', 'Troms', 'Finnmark',
+       'Svalbard']
+
+bygging["region"] = bygging.region.cat.rename_categories(fylker)
+
+bygging["statistikkvariabel"] = bygging.statistikkvariabel.astype("category")
+bygging.statistikkvariabel.cat.categories
+variabler = ['Boliger under arbeid', 'Fullfoert bruksareal (1 000 m2)',
+       'Fullfoerte boliger', 'Igangsatt bruksareal (1 000 m2)',
+       'Igangsatte boliger', 'Under arbeid, bruksareal (1 000 m�)']
+bygging["statistikkvariabel"] = bygging.statistikkvariabel.cat.rename_categories(variabler)
+bygging.rename(columns={"Boligbygg, etter region, statistikkvariabel og tid": "boligbygging"}, inplace=True)
+bygging["tid"] = pd.to_datetime(bygging.tid, format="%YM%m")
+bygging["boligbygging"]=bygging.boligbygging.astype(float)
+
+
+igangsatte = bygging[bygging.statistikkvariabel == "Igangsatte boliger"]
+rel_fylker = ['Oslo', 'Rogaland', 'Hordaland',  'Soer-Troendelag']
+igangsatte = igangsatte[bygging.region.isin(rel_fylker)]
+igangsatte["region"] = igangsatte.region.astype('str')
+
+from scipy.interpolate import UnivariateSpline
+
+igangsatte = igangsatte[igangsatte.boligbygging.notnull()]
+
+#bygging_by_city = igangsatte.groupby("region")
+Oslo = igangsatte[igangsatte.region=="Oslo"]
+Hordaland = igangsatte[igangsatte.region=="Hordaland"]
+Rogaland = igangsatte[igangsatte.region =="Rogaland"]
+Soer_Troendelag = igangsatte[igangsatte.region=="Soer-Troendelag"]
+
+#smooth the city data
+d = {"date":igangsatte["tid"][igangsatte.region=="Oslo"]}
+smooth_data = pd.DataFrame(data=d)
+t = len(city[1].tid)
+T = [i for i in range(t)]
+
+s_city = UnivariateSpline(T, Oslo.boligbygging, k=3, s=6000000)
+smooth_data["Oslo"] = s_city(T)
+
+s_city = UnivariateSpline(T, Hordaland.boligbygging, k=3, s=2000000)
+smooth_data["Hordaland"] = s_city(T)
+
+s_city = UnivariateSpline(T, Rogaland.boligbygging, k=3, s=2000000)
+smooth_data["Rogaland"] = s_city(T)
+
+s_city = UnivariateSpline(T, Soer_Troendelag.boligbygging, k=3, s=2000000)
+smooth_data["Soer-Troendelag"] = s_city(T)
+
+smooth_data_l = pd.melt(smooth_data, id_vars = "date")
+
+smooth_by_city = smooth_data_l.groupby("variable")
+
+bygging_by_city = igangsatte.groupby("region")
+
+fig, ax = plt.subplots(4)
+for a, city in enumerate(smooth_by_city):
+	ax[a].plot(city[1].date, city[1].value)
+	ax[a].set_ylabel(city[0], size=14)
+
+for a, city in enumerate(bygging_by_city):
+	ax[a].plot(city[1].tid, city[1].boligbygging, alpha=.2, color="blue")
+	#n = len(region[1].value)
+#ax.set_ylabel("Number of new dwellings", size=14)
+fig.set_size_inches(6,8)
+fig.set_label("New housing starts, by principality with major city")
+#fig.savefig("figures/city_new_dwellings.png")
+plt.show()
+
+#Hele landet
+
+bygging = pd.read_csv("http://data.ssb.no/api/v0/dataset/95146.csv?lang=no", sep=";", header=0, decimal=",")
+bygging["statistikkvariabel"] = bygging.statistikkvariabel.astype("category")
+bygging.statistikkvariabel.cat.categories
+variabler = ['Boliger under arbeid', 'Fullfoert bruksareal (1 000 m2)',
+       'Fullfoerte boliger', 'Igangsatt bruksareal (1 000 m2)',
+       'Igangsatte boliger', 'Under arbeid, bruksareal (1 000 m�)']
+bygging["statistikkvariabel"] = bygging.statistikkvariabel.cat.rename_categories(variabler)
+bygging.rename(columns={"Boligbygg, etter region, statistikkvariabel og tid": "boligbygging"}, inplace=True)
+bygging["tid"] = pd.to_datetime(bygging.tid, format="%YM%m")
+bygging["boligbygging"]=bygging.boligbygging.astype(float)
+
+igangsatte = bygging[bygging.statistikkvariabel == "Igangsatte boliger"]
+t = len(igangsatte.tid)
+T = [i for i in range(t)]
+
+s_igangsatte = UnivariateSpline(T, igangsatte.boligbygging, k=3, s=50000000)
+smooth_igangsatte = s_igangsatte(T)
+
+
+fig, ax = plt.subplots()
+ax.plot(igangsatte.tid, igangsatte.boligbygging, alpha=.5)
+ax.plot(igangsatte.tid, smooth_igangsatte)
+ax.set_ylabel("New housing starts")
+plt.show()
+
 
 #Housing: long time series from norgesbank
 #1912 = 100
