@@ -522,21 +522,16 @@ plt.show()
 
 
 #Looking at movement to the cities
-pop = pd.read_csv("http://data.ssb.no/api/v0/dataset/49577.csv?lang=no", sep=";")
 
-
-
+#Oslo population, by part of city
+oslo_pop = pd.read_csv("http://data.ssb.no/api/v0/dataset/1010.csv?lang=no",sep=";",  decimal=",")
+oslo_pop["grunnkrets"] = oslo_pop.grunnkrets.astype("category")
 
 #Looking at building in the cities
 bygging = pd.read_csv("http://data.ssb.no/api/v0/dataset/26025.csv?lang=no", sep=";", header=0, decimal=",")
 bygging["region"]=bygging.region.astype('category')
 
-fylker = ['Oestfold', 'Akershus', 'Oslo', 'Hedmark', 'Oppland',
-       'Buskerud', 'Vestfold', 'Telemark', 'Aust-Agder',
-       'Vest-Agder', 'Rogaland', 'Hordaland', 'Sogn og Fjordane',
-       'Moere og Romsdal', 'Soer-Troendelag', 'Nord-Troendelag',
-       'Nordland', 'Troms', 'Finnmark',
-       'Svalbard']
+
 
 bygging["region"] = bygging.region.cat.rename_categories(fylker)
 
@@ -602,6 +597,57 @@ for a, city in enumerate(bygging_by_city):
 fig.set_size_inches(6,8)
 fig.set_label("New housing starts, by principality with major city")
 #fig.savefig("figures/city_new_dwellings.png")
+plt.show()
+
+
+fylker = ['Oestfold', 'Akershus', 'Oslo', 'Hedmark', 'Oppland',
+       'Buskerud', 'Vestfold', 'Telemark', 'Aust-Agder',
+       'Vest-Agder', 'Rogaland', 'Hordaland',
+       'Bergen', 'Sogn og Fjordane', 'Moere og Romsdal',
+       'Sør-Trøndelag', 'Nord-Troendelag', 'Nordland',
+       'Troms', 'Finnmark']
+
+
+#Look at population
+population = pd.read_csv("http://data.ssb.no/api/v0/dataset/49623.csv?lang=no", sep=";")
+population["tid"] = pd.to_datetime(population.tid, format="%Y")
+
+population.region = population.region.astype('category')
+
+population["region"] = population.region.cat.rename_categories(fylker)
+population = population[population.region.isin(['Oslo', 'Rogaland', 'Hordaland','Sør-Trøndelag'])]
+
+population.columns = ["region", "tid", "statistikkvariabel", "population"]
+population["population"] = population.population.astype(float)
+population.region = population.region.astype(str)
+
+innflyttinger = population[population.statistikkvariabel.isin(["Innflyttinger"])]
+del innflyttinger["statistikkvariabel"]
+innflyttinger.columns = ['region', 'tid', 'innflyttinger']
+innflyttinger["utflyttinger"] = population.population[population.statistikkvariabel=="Utflyttinger"].values
+innflyttinger["net_migration"] = innflyttinger["innflyttinger"] - innflyttinger["utflyttinger"]
+folkemengde = population[population.statistikkvariabel=="Folkemengde"]
+
+innflyttinger_by_city = innflyttinger.groupby("region")
+fig, ax = plt.subplots()
+for city in innflyttinger_by_city:
+	ax.plot(city[1].tid.iloc[10:-1], city[1].net_migration.iloc[10:-1], label=city[0])
+ax.text(pd.to_datetime(2002, format="%Y"), 6000, "Oslo")
+ax.text(pd.to_datetime(1975, format="%Y"), 2500, "Rogaland")
+ax.text(pd.to_datetime(2006, format="%Y"), 800, "Sør-Trøndelag")
+ax.text(pd.to_datetime(1965, format="%Y"), 3000, "Hordaland")
+ax.set_ylabel("Net migration, principalities with major cities")
+plt.show()
+
+folkemengde_by_city = folkemengde.groupby("region")
+for city in folkemengde_by_city:
+	ax[1].plot(city[1].tid.iloc[20:-1], city[1].population.iloc[20:-1], label=city[0])
+#ax[1].text(pd.to_datetime(1997, format="%Y"), 34000, "Oslo")
+#ax[1].text(pd.to_datetime(1965, format="%Y"), 3000, "Rogaland (Stavanger)")
+#ax[1].text(pd.to_datetime(1997, format="%Y"), 4000, "Sør-Trøndelag (Trondheim)")
+#ax[1].text(pd.to_datetime(1997, format="%Y"), 14000, "Hordaland (Bergen)")
+ax[1].set_ylabel("Population")
+
 plt.show()
 
 #Hele landet

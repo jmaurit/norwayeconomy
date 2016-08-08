@@ -171,7 +171,7 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 27666,
+				"buffer_size": 33076,
 				"line_ending": "Unix"
 			}
 		},
@@ -206,7 +206,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 9517,
+				"buffer_size": 9792,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -379,6 +379,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"bygging",
 			"pkon",
 			"imports",
 			"eksport",
@@ -445,6 +446,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"pop",
 			"okon",
 			"pkon",
 			"imports",
@@ -517,15 +519,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 27666,
+						"buffer_size": 33076,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								16575,
-								16657
+								20772,
+								20772
 							]
 						],
 						"settings":
@@ -534,7 +536,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 17036.0,
+						"translation.y": 20364.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -627,15 +629,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 9517,
+						"buffer_size": 9792,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4701,
-								4701
+								4934,
+								4934
 							]
 						],
 						"settings":
@@ -646,7 +648,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4745.0,
+						"translation.y": 4583.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
