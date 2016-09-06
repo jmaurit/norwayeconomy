@@ -171,7 +171,7 @@
 			"file": "ssb_data.py",
 			"settings":
 			{
-				"buffer_size": 33076,
+				"buffer_size": 34101,
 				"line_ending": "Unix"
 			}
 		},
@@ -194,21 +194,21 @@
 			}
 		},
 		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 10088,
+				"line_ending": "Unix",
+				"name": "index.html"
+			}
+		},
+		{
 			"file": "maps_notes.txt",
 			"settings":
 			{
 				"buffer_size": 201,
 				"line_ending": "Unix",
 				"name": "maps_notes.txt"
-			}
-		},
-		{
-			"file": "index.html",
-			"settings":
-			{
-				"buffer_size": 9792,
-				"line_ending": "Unix",
-				"name": "index.html"
 			}
 		},
 		{
@@ -379,6 +379,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"ax[0]",
+			"ax",
+			"pop",
+			"fylker=",
+			"fylker",
 			"bygging",
 			"pkon",
 			"imports",
@@ -446,6 +451,10 @@
 		"regex": false,
 		"replace_history":
 		[
+			"ax",
+			"ax[1]",
+			"ax[0]",
+			"population",
 			"pop",
 			"okon",
 			"pkon",
@@ -511,7 +520,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -519,15 +528,15 @@
 					"file": "ssb_data.py",
 					"settings":
 					{
-						"buffer_size": 33076,
+						"buffer_size": 34101,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								20772,
-								20772
+								21945,
+								19557
 							]
 						],
 						"settings":
@@ -536,7 +545,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 20364.0,
+						"translation.y": 20327.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -553,8 +562,8 @@
 						"selection":
 						[
 							[
-								8158,
-								8158
+								7683,
+								7770
 							]
 						],
 						"settings":
@@ -565,7 +574,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8165.0,
+						"translation.y": 8025.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -599,6 +608,35 @@
 				},
 				{
 					"buffer": 3,
+					"file": "index.html",
+					"settings":
+					{
+						"buffer_size": 10088,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8711,
+								8711
+							]
+						],
+						"settings":
+						{
+							"auto_name": "index.html",
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 777.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
 					"file": "maps_notes.txt",
 					"settings":
 					{
@@ -620,35 +658,6 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "index.html",
-					"settings":
-					{
-						"buffer_size": 9792,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4934,
-								4934
-							]
-						],
-						"settings":
-						{
-							"auto_name": "index.html",
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4583.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -772,9 +781,9 @@
 		"width": 380.0
 	},
 	"show_minimap": true,
-	"show_open_files": true,
+	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 261.0,
 	"status_bar_visible": true
 }
