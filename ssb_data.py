@@ -62,6 +62,8 @@ def format_df(df):
 	df["value"] = df.value.astype(float)
 	return(df)
 
+#Regionalt, trondheim
+
 #Nasjonalregnskap
 
 NR=pd.read_csv("http://data.ssb.no/api/v0/dataset/59022.csv", 
