@@ -7,7 +7,6 @@ import statsmodels.formula.api as smf
 import statsmodels.api as sm
 import sys
 import pystan
-from ggplot import *
 import math
 import re
 import json
@@ -62,8 +61,33 @@ def format_df(df):
 	df["value"] = df.value.astype(float)
 	return(df)
 
-#Regionalt, trondheim
+#internasjonal handel
 
+ih = pd.read_csv("http://data.ssb.no/api/v0/dataset/58962.csv?lang=no", 
+	sep=";", decimal=",", na_values = [".", ".."])
+
+ih.columns = ["flow", "date", "variable", "value"]
+ih.date = convert_datetime(ih.date)
+ih.flow.unique()
+
+include = ['Etotusorn Fastlandseksport', 'Eoljegass Eksport av r�olje, naturgass og kondensater']
+eksport  = ih[ih.flow.isin(include)]
+eksport["value"] = eksport.value.astype(float)
+eksport_w = eksport.pivot(index='date', columns='flow', values='value')
+eksport_w.reset_index(inplace=True)
+
+eksport_w.columns = ["date", "petroleum_export", "non_petroleum_export"]
+
+eksport_w["perc_petroleum_export"] = eksport_w.petroleum_export.diff(periods=12)
+eksport_w["smooth_petroleum_export"] = pd.rolling_mean(eksport_w.petroleum_export, window=12)
+eksport_w["perc_non_petroleum_export"] = eksport_w.non_petroleum_export.diff(periods=12)
+eksport_w["smooth_non_petroleum_export"] = pd.rolling_mean(eksport_w.non_petroleum_export, window=12)
+
+
+fig, ax = plt.subplots()
+ax.plot(eksport_w.date, eksport_w.petroleum_export)
+ax.plot(eksport_w.date, eksport_w.non_petroleum_export)
+plt.show()
 #Nasjonalregnskap
 
 NR=pd.read_csv("http://data.ssb.no/api/v0/dataset/59022.csv", 
