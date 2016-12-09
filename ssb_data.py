@@ -88,6 +88,20 @@ fig, ax = plt.subplots()
 ax.plot(eksport_w.date, eksport_w.petroleum_export)
 ax.plot(eksport_w.date, eksport_w.non_petroleum_export)
 plt.show()
+
+
+include = ["Hbtotuso Handelsbalansen (Eksport - import, begge uten skip og oljeplattformer)", "Hbtusorn Handelsbalansen (Fastlandseksport - import utenom skip og oljeplattformer)"]
+bal  = ih[ih.flow.isin(include)]
+bal["value"] = bal.value.astype(float)
+bal_w = bal.pivot(index='date', columns='flow', values='value')
+bal_w.reset_index(inplace=True)
+
+bal_w.columns = ["date", "trade_bal", "trade_bal_ex_pet"]
+fig, ax = plt.subplots()
+ax.plot(bal_w.date, bal_w.trade_bal)
+ax.plot(bal_w.date, bal_w.trade_bal_ex_pet)
+plt.show()
+
 #Nasjonalregnskap
 
 NR=pd.read_csv("http://data.ssb.no/api/v0/dataset/59022.csv", 
