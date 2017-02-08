@@ -1,5 +1,134 @@
 #http://ramiro.org/notebook/basemap-choropleth/
 
+#cartopy library for mapping
+#From python for research
+import pandas as pd
+import numpy as np
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+import matplotlib.pyplot as plt
+import cartopy.io.shapereader as shpreader
+
+#example using cartopy:
+
+birddata = pd.read_csv("bird_tracking.csv")
+bird_names = np.unique(birddata.bird_name)
+
+proj = ccrs.Mercator()
+
+plt.figure(figsize = (10,10))
+ax = plt.axes(projection=proj)
+ax.set_extent([0, 30.0, 55, 70])
+ax.add_feature(cfeature.LAND)
+ax.add_feature(cfeature.OCEAN)
+ax.add_feature(cfeature.COASTLINE)
+ax.add_feature(cfeature.BORDERS, linestyle=":")
+plt.show()
+
+
+#now with shapefile
+#from
+# https://ocefpaf.github.io/python4oceanographers/blog/2015/02/02/cartopy_folium_shapefile/
+kw = dict(resolution='10m', category='cultural',
+          name='admin_1_states_provinces')
+
+states_shp = shpreader.natural_earth(**kw)
+
+shp = shpreader.Reader(states_shp)
+
+
+subplot_kw = dict(projection=ccrs.Mercator())
+
+fig, ax = plt.subplots(figsize=(12, 15),
+                       subplot_kw=subplot_kw)
+ax.set_extent((0, 30.0, 52, 72))
+
+for record, state in zip(shp.records(), shp.geometries()):
+    if record.attributes['admin'] == 'Norway':
+          ax.add_geometries([state], ccrs.PlateCarree(), facecolor="gray", edgecolor='black')
+plt.show()
+
+
+#read files from folder and start to plot
+#read shapefile
+shape_country = 'norway_shape/NOR_adm_shp/NOR_adm0'
+shape_county = 'norway_shape/NOR_adm_shp/NOR_adm1'
+shape_princ = 'norway_shape/kartverket/kommuner/kommuner'
+
+reader_prins = shpreader.Reader(shape_princ)
+norway_prins= reader_prins.geometries()
+#match with data
+income = pd.read_csv("http://data.ssb.no/api/v0/dataset/49678.csv", sep=";")
+
+income_2015 = income[income.tid==2015]
+income_2015 = income_2015[income_2015.husholdningstype =="0000 Alle husholdninger"]
+income_2015 = income_2015[income_2015.statistikkvariabel =="Inntekt etter skatt, median (kr)"]
+income_2015 = income_2015.iloc[:,[0,4]]
+income_2015.columns = ["region", "income"]
+
+kode = income_2015.region.str.split(" ").str.get(0)
+income_2015_dict = dict(zip(kode, income_2015.income.values))
+
+#next(norway_counties)
+
+reader_country = shpreader.Reader(shape_country)
+#countries = reader_country.records()
+#country = next(countries)
+norway = reader_country.geometries()
+norway_geom = next(norway)
+
+norway_rec = reader_country.records()
+norway_record = next(norway_rec)
+
+
+subplot_kw = dict(projection=ccrs.Mercator())
+fig, ax = plt.subplots(figsize=(15, 20),
+                       subplot_kw=subplot_kw)
+ax.set_extent((0, 30.0, 52, 72))
+#ax.add_geometries(norway_geom, ccrs.Mercator(), facecolor="grey", edgecolor='black')
+for p in princ:
+  ax.add_geometries(p, ccrs.PlateCarree(), facecolor="grey", edgecolor='black')
+plt.show()
+
+for country in countries:
+  print(country.attributes["ADMIN"])
+
+population = lambda country: country.attributes['pop_est']
+
+# sort the countries by population and get the first 5
+countries_by_pop = sorted(reader.records(), key=population)[:5]
+
+geometries = reader_country.geometries()
+
+reader = shpreader.Reader('ne_10m_admin_1_states_provinces/ne_10m_admin_1_states_provinces')
+counties = reader.records()
+
+for county in counties:
+  #print(county.attributes["adm0_name"])
+  print(county.attributes["name"])
+
+county = next(counties)
+print(type(county.attributes))
+print(sorted(county.attributes.keys()))
+
+ax.background_patch.set_visible(False)
+ax.outline_patch.set_visible(False)
+
+plt.title('counties')
+
+for county in shpreader.Reader(counties_shp).geometries():
+    # pick a default color for the land with a black outline,
+    # this will change if the storm intersects with our track
+    facecolor = [0.9375, 0.9375, 0.859375]
+    edgecolor = 'black'
+    facecolor = '#FF7E00'
+    ax.add_geometries([county], ccrs.PlateCarree(),
+                  facecolor=facecolor, edgecolor=edgecolor)
+plt.show()
+
+
+
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
