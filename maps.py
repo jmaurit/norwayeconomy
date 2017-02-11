@@ -11,6 +11,23 @@ import cartopy.io.shapereader as shpreader
 
 #example using cartopy:
 
+#innvandrer data
+innvand = pd.read_csv("http://data.ssb.no/api/v0/dataset/48644.csv?lang=en", sep=",", na_values = [".", ".."])
+befolk = pd.read_csv("http://data.ssb.no/api/v0/dataset/1108.csv?lang=en", sep=",", na_values = [".", ".."])
+
+innvand16 = innvand[innvand.time == 2016]
+
+tot_innvand16 = innvand16.groupby("region")["Immigrants by region, sex, country background and time"].aggregate(sum)
+
+befolk16 = befolk[befolk.contents == "Population at the beginning of the quarter"]
+befolk16 = befolk16.iloc[:,[0,3]]
+befolk16 = befolk16.set_index("region")
+
+immig = pd.concat([befolk16, tot_innvand16], axis=1)
+immig.columns = ["population", "immigrants"]
+immig.loc[:,"population"] = immig.population.astype(float)
+immig["immig_perc"] = immig.immigrants/immig.population*100
+
 birddata = pd.read_csv("bird_tracking.csv")
 bird_names = np.unique(birddata.bird_name)
 

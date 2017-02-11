@@ -1,0 +1,76 @@
+hmm.txt
+
+Notes from Introduction to HMMs
+
+using a common short-time model for each of the steady, well-behaved parts of the signal, with some characterization of how one such period evolves to the next. 
+
+How HMM work
+
+Three problems: 
+1.) How these periods can be identified
+2.) How the sequentially evolving nature of these periods can be characterized
+3.) What typical or common short time model should be chosen for each of these periods.
+
+An HMM is a doubly stochastic process with an underlying stochastic process that is not observable (hidden) but can only be observed through another set of stochastic processes that produce the sequence of observed symbols. 
+
+N-states in the model
+
+t - at each time t a new state is entered based on a transition prob. distr. on the previous state. 
+
+After each transition is made, an observation output symbol is produced according to a prob. distribution with depends on the current state. N such observation probability distributions - random variables. 
+
+Discrete observation HMM: 
+
+T = length of the observation sequence
+N = number of states (urns) in the model
+M = number of observation symbols (colors)
+Q = {q1, q2, q3, q4,...,qN} states (urns)
+V = {v1, v2, v3, v4,...,vnM} discrete set of possible symbol observations (colors)
+A = [aij], aij = Pr(qj at t+1 | qi at t), state transition prob. 
+B = {bj(k)}, bj(k) = Pr(vk at t|qj at t), observation symbol prob. dist. in state j. 
+pi = {pi_i}, pi_i = Pr(Qi at t=1), initial state distribution.
+
+
+An observation sequence, O = O1, O2, O3,...,OT is generated as follows. 
+
+1. Choose an initial state, i1, according to the initial state distribution, pi
+
+2. set t = 1
+
+3. Choose Ot according to b_it(k), the symbol prob. dist. in state i_ti (that is, draw the ball from the urn)
+
+4. choose i_t+1 according to {a_it}, i_t+1 = 1, 2,..., N
+
+5. set t = t+1, return to step 3 if t<T
+
+compact notation = delta = (A, B, pi)
+
+
+We wish to calc. the prob of the observation sequence O, given the model, delta, 
+
+For every fixed state sequence I = i1i2...iT, the prob. of the observation sequence O is Pr(O|I, delta), where
+
+Pr(O|I, delta) = bi1(O1)bi2(O2)...biT(OT)
+
+The prob of such a state sequence, I, is
+Pr(I|delta) = pi_i*a_i1_i2*a_i2_i3*ai3i4....aiT-1iT
+
+Joint prob is the prod Pr(0,I|delta) = Pr(O|I, delta)Pr(I|delta)
+
+marg Prob(O) = summing over all possible state sequences
+
+Need forward-backward algorithm to solve this.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

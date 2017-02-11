@@ -188,7 +188,7 @@
 			"file": "norway_chl.py",
 			"settings":
 			{
-				"buffer_size": 2986,
+				"buffer_size": 4078,
 				"line_ending": "Unix",
 				"name": "norway_chl.py"
 			}
@@ -214,7 +214,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 10709,
+				"buffer_size": 10846,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -598,7 +598,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 779.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -608,24 +608,25 @@
 					"file": "norway_chl.py",
 					"settings":
 					{
-						"buffer_size": 2986,
+						"buffer_size": 4078,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2982,
-								2982
+								2766,
+								2766
 							]
 						],
 						"settings":
 						{
 							"auto_name": "norway_chl.py",
-							"syntax": "Packages/Python/Python.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2737.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -653,7 +654,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 50879.0,
+						"translation.y": 11043.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -690,15 +691,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 10709,
+						"buffer_size": 10846,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3592,
-								3592
+								7811,
+								7811
 							]
 						],
 						"settings":
@@ -709,7 +710,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 8307.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
