@@ -8,6 +8,7 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import cartopy.io.shapereader as shpreader
+from matplotlib.colors import ListedColormap
 
 #class norway_chl(plt)???
 class norway_chl(object):
@@ -28,7 +29,7 @@ class norway_chl(object):
 		self.value = value
 		self.make_geo_dict()
 		#self.read_shp()
-		self.make_color_map()
+		#self.make_color_map()
 
 
 	def make_geo_dict(self):
@@ -73,7 +74,7 @@ class norway_chl(object):
 		self.bins = np.linspace(vmin, vmax, num_colors)
 		return([self.cmap, self.norm, self.bins])
 
-	def draw_map(self, title="title", legend_precision = 0):
+	def draw_map(self, title="title", legend_precision = 0, col_dict={}):
 		"""
 		draws maps
 		"""
@@ -96,7 +97,10 @@ class norway_chl(object):
 		        kode = "0" + str(kode)
 		    else:
 		        kode = str(kode)
-		    color= self.cmap(self.norm(self.geo_dict[kode]))      
+		    if len(col_dict)!=0:
+		    	color= col_dict[self.geo_dict[kode]] 
+		    else:
+		    	color= self.cmap(self.norm(self.geo_dict[kode]))      
 		    self.figure[1].add_geometries(princ, ccrs.PlateCarree(), facecolor=color, edgecolor="none")
 
 		#Norway- boundary
@@ -111,16 +115,27 @@ class norway_chl(object):
 		coords = [[5.3221, 60.3913], [10.7522, 59.9139], [10.3951, 63.4305], [5.7331, 58.9700], 
 		[8.0182, 58.1599], [18.9553, 69.6492]]
 
+		#cities
 		city_coords = zip(cities, coords)
 		for city, coords in city_coords: 
 			plt.text(coords[0],coords[1], city, horizontalalignment='right', transform=ccrs.Geodetic())
-		#legend
-		#[*left*, *bottom*, *width*,*height*]
-		#where
+		
 		ax_legend = self.figure[0].add_axes([0.7, 0.3, 0.03, 0.3], zorder=3)
-		ticks = np.round(self.bins[1:-1], legend_precision)
-		cb = mpl.colorbar.ColorbarBase(ax_legend, cmap=self.cmap, norm=self.norm, ticks=ticks, boundaries=self.bins, orientation='vertical')
-		cb.ax.set_title(title)
+
+		#legent
+		if len(col_dict)==0:
+			ticks = np.round(self.bins[1:-1], legend_precision)
+			cb = mpl.colorbar.ColorbarBase(ax_legend, cmap=self.cmap, norm=self.norm, ticks=ticks, boundaries=self.bins, orientation='vertical')
+			cb.ax.set_title(title)
+
+		else:
+			colors = [c for c in col_dict.values()]
+			cMap = ListedColormap(colors)
+			ticks = np.linspace(1/16,1-1/16,len(col_dict))
+			cb = mpl.colorbar.ColorbarBase(ax_legend, cmap=cMap, ticks=ticks, orientation='vertical')
+			categs = [i for i in col_dict.keys()]  
+			cb.set_ticklabels(categs)
+			cb.ax.set_title(title)
 
 		return(self.figure)
 	

@@ -61,6 +61,24 @@ def format_df(df):
 	df["value"] = df.value.astype(float)
 	return(df)
 
+
+#valg deltakelse
+
+valg2015 = pd.read_csv("https://www.ssb.no/eksport/tabell.csv?key=271517", sep=";", decimal=",", na_values = [".", ".."])
+del valg2015["Unnamed: 14"]
+
+
+def biggestparty(komm):
+	#print(komm)
+	#komm = valg2015.iloc[0,:]
+	return(np.argmax(komm[1:]))
+
+#biggestparty(valg2015.iloc[0,:])
+
+valg2015["biggest"] = valg2015.apply(biggestparty, axis=1)
+
+
+
 #internasjonal handel
 
 ih = pd.read_csv("http://data.ssb.no/api/v0/dataset/58962.csv?lang=no", 
