@@ -185,7 +185,10 @@
 			}
 		},
 		{
+			"contents": "#norway_chl.py\n#class\n\nimport pandas as pd\nimport numpy as np\nimport cartopy.crs as ccrs\nimport cartopy.feature as cfeature\nimport matplotlib.pyplot as plt\nimport matplotlib as mpl\nimport cartopy.io.shapereader as shpreader\nfrom matplotlib.colors import ListedColormap\n\n#class norway_chl(plt)???\nclass norway_chl(object):\n	\"\"\"Takes a dataframe with a single series with floats per \n	municipality in norway with 4-digit identifier. Outputs\n	Chloropleth map. \n	arguments:\n	df = dataframe with dataset\n	geo = name of column with SSB region identifier\n	value = name of column with value series to be plotted\n	ex: \n	norway_chl(df = mydf, geo = \"region\", value = \"value\")\n	\"\"\"\n\n	def __init__(self, df, geo = \"region\", value = \"value\"):\n		self.df = df\n		self.geo = geo\n		self.value = value\n		self.make_geo_dict()\n		#self.read_shp()\n		#self.make_color_map()\n\n\n	def make_geo_dict(self):\n		\"\"\"\n		takes dataframe and region\n		\"\"\"\n		kode = self.df[self.geo].str.split(\" \").str.get(0)\n		self.geo_dict = dict(zip(kode, self.df[self.value].values))\n		return(self.geo_dict)\n\n	def read_shp(self, adm = \"munic\"):\n		\"\"\"Input 'munic', 'county', or 'country' for level of \n		administrative detail. default is 'munic'. returns iterative\n		reader file\"\"\"\n		if adm == \"munic\":\n			shape_file = 'norway_shape/kartverket/kommuner/kommuner'\n		elif adm == \"county\":\n			shape_file = \"norway_shape/NOR_adm_shp/NOR_adm1\"\n		elif adm == \"country\":\n			shape_file = \"norway_shape/NOR_adm_shp/NOR_adm0\"\n		else:\n			shape_file = 'norway_shape/NOR_adm_shp/NOR_adm0'\n		\n		reader_file = shpreader.Reader(shape_file)\n		return(reader_file)\n\n	def make_color_map(self, num_colors=10, col_scheme = \"Greens\"):\n		if col_scheme == \"Greens\":\n			self.cmap = plt.cm.Greens\n		elif col_scheme == \"PRGn\":\n			self.cmap = plt.cm.PRGn\n		elif col_scheme == \"YlGn\":\n			self.cmap = plt.cm.YlGn\n		elif col_scheme == \"ocean\":\n			self.cmap = plt.cm.ocean\n		else:\n			self.cmap =plt.cm.Greens\n\n		vmin = self.df[self.value].min()\n		vmax = self.df[self.value].max()\n		self.norm = mpl.colors.Normalize(vmin = vmin, vmax=vmax)\n		self.bins = np.linspace(vmin, vmax, num_colors)\n		return([self.cmap, self.norm, self.bins])\n\n	def draw_map(self, title=\"title\", legend_precision = 0, col_dict={}):\n		\"\"\"\n		draws maps\n		\"\"\"\n		subplot_kw = dict(projection=ccrs.Mercator())\n\n		self.figure = plt.subplots(figsize=(10, 14),\n		                       subplot_kw=subplot_kw)\n		self.figure[1].set_frame_on(False)\n		self.figure[1].outline_patch.set_visible(False)\n		self.figure[1].background_patch.set_alpha(0)\n		#figure[0] = fig\n		#figure[1] = ax\n		self.figure[1].set_extent((2, 32.0, 56, 71))\n\n		#counties\n		reader_file = self.read_shp(\"munic\")\n		for princ, rec in zip(reader_file.geometries(), reader_file.records()):\n		    kode = rec.attributes[\"komm\"]\n		    if kode<1000:\n		        kode = \"0\" + str(kode)\n		    else:\n		        kode = str(kode)\n		    if len(col_dict)!=0:\n		    	color= col_dict[self.geo_dict[kode]] \n		    else:\n		    	color= self.cmap(self.norm(self.geo_dict[kode]))      \n		    self.figure[1].add_geometries(princ, ccrs.PlateCarree(), facecolor=color, edgecolor=\"none\")\n\n		#Norway- boundary\n		reader_norway = self.read_shp(\"country\")\n		norway = reader_norway.geometries()\n		norway_geom = next(norway)\n		self.figure[1].add_geometries(norway_geom, ccrs.PlateCarree(), facecolor=\"none\", edgecolor='black', alpha=.5)\n		\n		#cities:\n		cities = [\"Bergen\", \"Oslo\", \"Trondheim\", \"Stavanger\", \"Kristiansand\", \"Tromsø\"]\n#(long, lat)\n		coords = [[5.3221, 60.3913], [10.7522, 59.9139], [10.3951, 63.4305], [5.7331, 58.9700], \n		[8.0182, 58.1599], [18.9553, 69.6492]]\n\n		#cities\n		city_coords = zip(cities, coords)\n		for city, coords in city_coords: \n			plt.text(coords[0],coords[1], city, horizontalalignment='right', transform=ccrs.Geodetic())\n		\n		ax_legend = self.figure[0].add_axes([0.7, 0.3, 0.03, 0.3], zorder=3)\n\n		#legend\n		if len(col_dict)==0:\n			ticks = np.round(self.bins[1:-1], legend_precision)\n			cb = mpl.colorbar.ColorbarBase(ax_legend, cmap=self.cmap, norm=self.norm, ticks=ticks, boundaries=self.bins, orientation='vertical')\n			cb.ax.set_title(title)\n\n		else:\n			colors = [c for c in col_dict.values()]\n			cMap = ListedColormap(colors)\n			ticks = np.linspace(1/16,1-1/16,len(col_dict))\n			cb = mpl.colorbar.ColorbarBase(ax_legend, cmap=cMap, ticks=ticks, orientation='vertical')\n			categs = [i for i in col_dict.keys()]  \n			cb.set_ticklabels(categs)\n			cb.ax.set_title(title)\n\n		return(self.figure)\n	\n	def save_plot(self, file_path):\n		self.figure[0].savefig(file_path, bbox_inches='tight')\n\n\n\n\n",
 			"file": "norway_chl.py",
+			"file_size": 4540,
+			"file_write_time": 1486920995000000,
 			"settings":
 			{
 				"buffer_size": 4539,
@@ -615,8 +618,8 @@
 						"selection":
 						[
 							[
-								3348,
-								3340
+								4420,
+								4420
 							]
 						],
 						"settings":
@@ -626,7 +629,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3234.0,
+						"translation.y": 4083.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
