@@ -217,7 +217,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 11252,
+				"buffer_size": 11862,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -404,6 +404,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"CO2_emissions",
 			"eksport",
 			"ax[0]",
 			"ax",
@@ -547,7 +548,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -694,15 +695,15 @@
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 11252,
+						"buffer_size": 11862,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10719,
-								10719
+								9894,
+								9894
 							]
 						],
 						"settings":
@@ -713,7 +714,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 10759.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
