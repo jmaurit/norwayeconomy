@@ -197,14 +197,6 @@
 			}
 		},
 		{
-			"file": "/Users/johannesmauritzen/Python/BayesianPython/ThinkBayes2/code/thinkbayes2.py",
-			"settings":
-			{
-				"buffer_size": 68136,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "kommune_clean.py",
 			"settings":
 			{
@@ -217,7 +209,7 @@
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 11862,
+				"buffer_size": 12583,
 				"line_ending": "Unix",
 				"name": "index.html"
 			}
@@ -328,6 +320,7 @@
 	},
 	"file_history":
 	[
+		"/Users/johannesmauritzen/Python/BayesianPython/ThinkBayes2/code/thinkbayes2.py",
 		"/Users/johannesmauritzen/Python/BayesianPython/ThinkBayes2/code/cookie2.py",
 		"/Users/johannesmauritzen/Python/BayesianPython/ThinkBayes2/code/cookie3.py",
 		"/Users/johannesmauritzen/Python/BayesianPython/ThinkBayes2/code/euro3.py",
@@ -548,7 +541,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -629,42 +622,14 @@
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 4083.0,
+						"translation.x": 7.0,
+						"translation.y": 196.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "/Users/johannesmauritzen/Python/BayesianPython/ThinkBayes2/code/thinkbayes2.py",
-					"settings":
-					{
-						"buffer_size": 68136,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 11043.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
 					"file": "kommune_clean.py",
 					"settings":
 					{
@@ -691,19 +656,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 4,
 					"file": "index.html",
 					"settings":
 					{
-						"buffer_size": 11862,
+						"buffer_size": 12583,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9894,
-								9894
+								10508,
+								10508
 							]
 						],
 						"settings":
@@ -714,13 +679,13 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 10759.0,
+						"translation.y": 11210.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "maps_notes.txt",
 					"settings":
 					{
@@ -747,7 +712,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 6,
 					"file": "website.css",
 					"settings":
 					{
@@ -775,7 +740,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 7,
 					"file": "notes.txt",
 					"settings":
 					{
