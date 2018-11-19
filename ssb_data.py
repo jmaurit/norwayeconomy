@@ -52,9 +52,9 @@ def convert_datetime(date_series):
 
 def format_df(df):
 	"""
-	columns should be labeled with "time" for the date and 
-	"value" for the date. 
-	inserts na values and converts value to float type. 
+	columns should be labeled with "time" for the date and
+	"value" for the date.
+	inserts na values and converts value to float type.
 	"""
 	df["time"] = convert_datetime(df.time)
 	df["value"][df.value == ".."] =np.nan
@@ -81,7 +81,7 @@ valg2015["biggest"] = valg2015.apply(biggestparty, axis=1)
 
 #internasjonal handel
 
-ih = pd.read_csv("http://data.ssb.no/api/v0/dataset/58962.csv?lang=no", 
+ih = pd.read_csv("http://data.ssb.no/api/v0/dataset/58962.csv?lang=no",
 	sep=";", decimal=",", na_values = [".", ".."])
 
 ih.columns = ["flow", "date", "variable", "value"]
@@ -122,7 +122,7 @@ plt.show()
 
 #Nasjonalregnskap
 
-NR=pd.read_csv("http://data.ssb.no/api/v0/dataset/59022.csv", 
+NR=pd.read_csv("http://data.ssb.no/api/v0/dataset/59022.csv",
          sep=";", decimal=",", na_values = [".", ".."])
 NR.columns = ["variabel", "kvartal", "enhet", "verdi"]
 
@@ -251,7 +251,7 @@ okon = NRSA[NRSA.kateg=="koo"]
 
 del okon["kateg"]
 okon_w = okon.pivot(index='kvartal', columns='variabel', values='verdi')
-okon_w.columns =['Public sector', 
+okon_w.columns =['Public sector',
 	  'Principalities',
        'State',
        'State, Military',
@@ -533,7 +533,7 @@ prices_by_region = house_prices.groupby("region")
 for region in prices_by_region:
 	names.append(region[0])
 
-new_names = ["Oslo with Baerum", "Stavanger", "Bergen", 
+new_names = ["Oslo with Baerum", "Stavanger", "Bergen",
 "Trondheim", "Akershus", "Southeast", "Hedmark and Oppland",
 "Agder and Rogaland", "Westcoast", "Troendelag", "Northern Norway",
 "Total"]
@@ -912,8 +912,8 @@ ir=pd.read_csv("http://www.norges-bank.no/WebDAV/stat/en/renter/v2/renter_mnd.cs
 ir["DATES"] = [datetime.strptime(d, "%b-%y") for d in ir.DATES]
 
 ir.columns = ['date', 'folio_nom', 'res_nom', 'dlaan_nom',
-	   'statskvl_3m_eff','statskvl_6m_eff', 'statskvl_9m_eff', 
-	   'statskvl_12m_eff','statsobl_3y_eff', 'statsobl_5y_eff', 
+	   'statskvl_3m_eff','statskvl_6m_eff', 'statskvl_9m_eff',
+	   'statskvl_12m_eff','statsobl_3y_eff', 'statsobl_5y_eff',
 	   'statsobl_10y_eff', 'nowa_rt','nowa_vl']
 
 
@@ -1004,7 +1004,7 @@ plt.show()
 
 #prices from NPD
 tot_prod=pd.read_csv("http://factpages.npd.no/ReportServer?/FactPages/TableView/field_production_totalt_NCS_month__DisplayAllRows&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&rs:Format=CSV&Top100=false&IpAddress=158.37.94.56&CultureCode=nb-no")
-tot_prod.columns = ['﻿prod_year', 'prod_month', 
+tot_prod.columns = ['﻿prod_year', 'prod_month',
 'oil_millm3', 'gas_billsm3',
 'ngl_millsm3', 'condensate_millsm3',
 'oe_millsm3', 'water_millsm3']
@@ -1059,8 +1059,3 @@ reserves=reserves = read.csv("http://factpages.npd.no/ReportServer?/FactPages/Ta
 #Import/Export
 #Export of goods:
 exports_by_type = pd.read_csv("https://data.ssb.no/api/v0/dataset/34256.csv?lang=en")
-
-
-
-
-
